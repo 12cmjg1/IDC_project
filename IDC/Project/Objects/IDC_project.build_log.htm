@@ -1,0 +1,73 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: ¦ÌVision V5.43.1.0
+Copyright (C) 2025 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: fen dan
+ZJU
+User-based license: Keil MDK Community (non-commercial free of charge)
+Valid until: Jun 1 2033. Cached until: May 24 2026
+ 
+Tool Versions:
+Toolchain:       Keil MDK Community (non-commercial free of charge  Version: 5.43.0.0
+Toolchain Path:  C:\Users\71504\AppData\Local\Keil_v5\ARM\ARMCLANG\Bin
+C Compiler:      ArmClang.exe V6.24
+Assembler:       Armasm.exe V6.24
+Linker/Locator:  ArmLink.exe V6.24
+Library Manager: ArmAr.exe V6.24
+Hex Converter:   FromElf.exe V6.24
+CPU DLL:         SARMCM3.DLL V5.43.0.0
+Dialog DLL:      DCM.DLL V1.17.5.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.3.1.0
+Dialog DLL:      TCM.DLL V1.56.6.0
+ 
+<h2>Project:</h2>
+D:\myprograms\IDC\Project\IDC_project.uvprojx
+Project File Date:  05/18/2026
+
+<h2>Output:</h2>
+*** Using Compiler 'V6.24', folder: 'C:\Users\71504\AppData\Local\Keil_v5\ARM\ARMCLANG\Bin'
+Rebuild target 'Target_1'
+assembling startup_stm32f40_41xxx.s...
+compiling stm32f4xx_syscfg.c...
+compiling stm32f4xx_gpio.c...
+compiling stm32f4xx_it.c...
+compiling stm32f4xx_exti.c...
+compiling vesc_can.c...
+compiling main.c...
+compiling stm32f4xx_rcc.c...
+compiling misc.c...
+compiling line_follow.c...
+../USER/system_stm32f4xx.c(657): warning: while loop has empty body [-Wempty-body]
+  657 |     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS ) != RCC_CFGR_SWS_PLL);
+      |                                                                      ^
+../USER/system_stm32f4xx.c(657): note: put the semicolon on a separate line to silence this warning
+1 warning generated.
+compiling system_stm32f4xx.c...
+compiling actuator.c...
+compiling stm32f4xx_usart.c...
+compiling stm32f4xx_tim.c...
+compiling remote.c...
+compiling stm32f4xx_can.c...
+compiling stm32f4xx_adc.c...
+linking...
+Program Size: Code=24720 RO-data=1140 RW-data=32 ZI-data=2472  
+FromELF: creating hex file...
+".\Objects\IDC_project.axf" - 0 Error(s), 1 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: Keil
+                https://www.keil.com/pack/Keil.STM32F4xx_DFP.3.1.1.pack
+                Keil::STM32F4xx_DFP@3.1.1
+                STMicroelectronics STM32F4 Series Device Support
+
+<h2>Collection of Component include folders:</h2>
+
+<h2>Collection of Component Files used:</h2>
+Build Time Elapsed:  00:00:03
+</pre>
+</body>
+</html>
