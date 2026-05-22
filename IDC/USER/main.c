@@ -27,7 +27,7 @@ volatile uint32_t DEBUG_LineFollowStateEndUs = 0;
 #define USER_KEY_DEBOUNCE_US        30000U
 #define LINEFOLLOW_FORWARD_TIME_US  15000000U   /* 正向巡线 15s */
 #define LINEFOLLOW_TURN_TIME_US     1500000U    /* 原地转180 约1.5s (需实测调整) */
-#define LINEFOLLOW_REVERSE_TIME_US  15000000U   /* 反向巡线 15s */
+#define LINEFOLLOW_REVERSE_TIME_US  1500000U    /* 反向巡线 1.5s */
 
 #if defined(__CC_ARM)
 #pragma import(__use_no_semihosting)

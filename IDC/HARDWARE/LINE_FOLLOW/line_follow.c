@@ -12,12 +12,14 @@
 #define LINEFOLLOW_CAPTURE_PERIOD_US     10000U
 #define LINEFOLLOW_CROSS_THRESHOLD       30U
 #define LINEFOLLOW_LOST_WIDTH_THRESHOLD  4U
-#define LINEFOLLOW_BASE_ERPM_MAX         7000
-#define LINEFOLLOW_STEER_MAX_ERPM        5000
-#define LINEFOLLOW_LOST_STEER_ERPM       3500
-#define LINEFOLLOW_KP_NUM                4
+#define LINEFOLLOW_BASE_ERPM_MAX         12000
+#define LINEFOLLOW_STEER_MAX_ERPM        9000
+#define LINEFOLLOW_LOST_STEER_ERPM       6000
+#define LINEFOLLOW_OUTPUT_ERPM_MAX       16000
+#define LINEFOLLOW_FORWARD_SIGN          (-1)
+#define LINEFOLLOW_KP_NUM                10
 #define LINEFOLLOW_KP_DEN                1
-#define LINEFOLLOW_KD_NUM                2
+#define LINEFOLLOW_KD_NUM                4
 #define LINEFOLLOW_KD_DEN                1
 
 volatile uint8_t LineFollow_Enabled = 0;
@@ -293,7 +295,7 @@ void LineFollow_Task(uint16_t speed_scale)
         return;
     }
 
-    base_erpm = ((int32_t)speed_scale * LINEFOLLOW_BASE_ERPM_MAX) / 1000;
+    base_erpm = (((int32_t)speed_scale * LINEFOLLOW_BASE_ERPM_MAX) / 1000) * LINEFOLLOW_FORWARD_SIGN;
 
     if (LineFollow_Reverse != 0U)
     {
@@ -331,22 +333,22 @@ void LineFollow_Task(uint16_t speed_scale)
         right = base_erpm - steer_erpm;
     }
 
-    if (left > 12000)
+    if (left > LINEFOLLOW_OUTPUT_ERPM_MAX)
     {
-        left = 12000;
+        left = LINEFOLLOW_OUTPUT_ERPM_MAX;
     }
-    else if (left < -12000)
+    else if (left < -LINEFOLLOW_OUTPUT_ERPM_MAX)
     {
-        left = -12000;
+        left = -LINEFOLLOW_OUTPUT_ERPM_MAX;
     }
 
-    if (right > 12000)
+    if (right > LINEFOLLOW_OUTPUT_ERPM_MAX)
     {
-        right = 12000;
+        right = LINEFOLLOW_OUTPUT_ERPM_MAX;
     }
-    else if (right < -12000)
+    else if (right < -LINEFOLLOW_OUTPUT_ERPM_MAX)
     {
-        right = -12000;
+        right = -LINEFOLLOW_OUTPUT_ERPM_MAX;
     }
 
     LineFollow_LeftCmdErpm = (int16_t)left;

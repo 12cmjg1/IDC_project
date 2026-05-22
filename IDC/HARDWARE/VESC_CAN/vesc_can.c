@@ -171,6 +171,60 @@ void VescCan_SetRpm(uint8_t controller_id, int32_t erpm)
     }
 }
 
+void VescCan_SetBrakeCurrent(uint8_t controller_id, int32_t current_mA)
+{
+    CanTxMsg tx;
+    uint32_t ext_id = ((uint32_t)VESC_CAN_PACKET_SET_CURRENT_BRAKE << 8) | controller_id;
+    uint8_t mailbox;
+    uint8_t tx_status;
+
+    if (current_mA < 0)
+    {
+        current_mA = -current_mA;
+    }
+
+    tx.StdId = 0;
+    tx.ExtId = ext_id;
+    tx.IDE = CAN_Id_Extended;
+    tx.RTR = CAN_RTR_Data;
+    tx.DLC = 4;
+    tx.Data[0] = (uint8_t)((current_mA >> 24) & 0xFF);
+    tx.Data[1] = (uint8_t)((current_mA >> 16) & 0xFF);
+    tx.Data[2] = (uint8_t)((current_mA >> 8) & 0xFF);
+    tx.Data[3] = (uint8_t)(current_mA & 0xFF);
+    tx.Data[4] = 0;
+    tx.Data[5] = 0;
+    tx.Data[6] = 0;
+    tx.Data[7] = 0;
+
+    mailbox = CAN_Transmit(CAN1, &tx);
+    VescCan_LastMailbox = mailbox;
+    VescCan_TxCount++;
+    VescCan_UpdateRegs();
+
+    if (mailbox > 2U)
+    {
+        VescCan_LastTxStatus = 0xFFU;
+        VescCan_TxNoMailboxCount++;
+    }
+    else
+    {
+        tx_status = CAN_TransmitStatus(CAN1, mailbox);
+        VescCan_LastTxStatus = tx_status;
+
+        if (tx_status == CAN_TxStatus_Ok)
+        {
+            VescCan_TxOkCount++;
+        }
+        else if (tx_status == CAN_TxStatus_Failed)
+        {
+            VescCan_TxFailCount++;
+        }
+    }
+
+    VescCan_UpdateRegs();
+}
+
 void VescCan_RX0_IRQHandler(void)
 {
     CanRxMsg rx;

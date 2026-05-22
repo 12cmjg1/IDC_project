@@ -17,6 +17,7 @@ extern volatile uint16_t Act_SpeedScale;
 extern volatile uint8_t Act_GripperMode;
 extern volatile int8_t Act_LiftMode;
 extern volatile uint16_t Act_LiftPulseCount;
+extern volatile uint32_t Act_LiftTargetPulse;
 extern volatile uint32_t Act_LiftTriggerCount;
 extern volatile uint8_t Act_VescEnable;
 

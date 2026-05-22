@@ -18,6 +18,7 @@ typedef enum
 
 void VescCan_Init(void);
 void VescCan_SetRpm(uint8_t controller_id, int32_t erpm);
+void VescCan_SetBrakeCurrent(uint8_t controller_id, int32_t current_mA);
 void VescCan_RX0_IRQHandler(void);
 void VescCan_DebugPoll(void);
 
