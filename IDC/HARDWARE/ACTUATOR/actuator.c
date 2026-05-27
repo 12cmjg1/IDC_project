@@ -31,9 +31,9 @@
 #define EMM5_DIR_UP             0U
 #define EMM5_DIR_DOWN           1U
 #define EMM5_INIT_DELAY_MS      50U
-#define EMM5_LIFT_POS_LOW       0U
-#define EMM5_LIFT_POS_HIGH      5000U
-#define EMM5_LIFT_POS_MAX       7000U
+#define EMM5_LIFT_POS_TOP       0U
+#define EMM5_LIFT_POS_WORK      5000U
+#define EMM5_LIFT_POS_BOTTOM_MAX 7000U
 #define EMM5_LIFT_TRIM_STEP     300U
 
 volatile int16_t Act_LeftMotor = 0;
@@ -48,7 +48,7 @@ volatile int8_t Act_LiftMode = 0;
 volatile uint16_t Act_LiftPulseCount = EMM5_LIFT_TRIM_STEP;
 volatile uint32_t Act_LiftTriggerCount = 0;
 volatile uint8_t Act_VescEnable = 1;
-volatile uint32_t Act_LiftTargetPulse = EMM5_LIFT_POS_LOW;
+volatile uint32_t Act_LiftTargetPulse = EMM5_LIFT_POS_TOP;
 
 extern volatile uint8_t DEBUG_LineFollowState;
 
@@ -347,9 +347,9 @@ static void Emm5_PosControl(uint8_t dir, uint32_t pulses, uint8_t absolute_pos)
 
 static uint32_t Actuator_ClampLiftTarget(uint32_t target)
 {
-    if (target > EMM5_LIFT_POS_MAX)
+    if (target > EMM5_LIFT_POS_BOTTOM_MAX)
     {
-        return EMM5_LIFT_POS_MAX;
+        return EMM5_LIFT_POS_BOTTOM_MAX;
     }
 
     return target;
@@ -386,7 +386,7 @@ static void Emm5_Init(void)
     Actuator_DelayMs(EMM5_INIT_DELAY_MS);
     Emm5_ResetZero();
     Actuator_DelayMs(EMM5_INIT_DELAY_MS);
-    Act_LiftTargetPulse = EMM5_LIFT_POS_LOW;
+    Act_LiftTargetPulse = EMM5_LIFT_POS_TOP;
     Act_LiftMode = 0;
     Act_LiftSpeed = 0;
 }
@@ -529,11 +529,11 @@ void Actuator_UpdateFromRC(void)
 
         if (lift_pos == 2U)
         {
-            Emm5_MoveAbsolute(EMM5_LIFT_POS_HIGH);
+            Emm5_MoveAbsolute(EMM5_LIFT_POS_WORK);
         }
         else if (lift_pos == 0U)
         {
-            Emm5_MoveAbsolute(EMM5_LIFT_POS_LOW);
+            Emm5_MoveAbsolute(EMM5_LIFT_POS_TOP);
         }
     }
 
@@ -548,7 +548,7 @@ void Actuator_UpdateFromRC(void)
             }
             else
             {
-                Emm5_MoveAbsolute(EMM5_LIFT_POS_LOW);
+                Emm5_MoveAbsolute(EMM5_LIFT_POS_TOP);
             }
         }
         else
