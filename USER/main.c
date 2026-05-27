@@ -3,6 +3,7 @@
 #include "actuator.h"
 #include "vesc_can.h"
 #include "line_follow.h"
+#include "imu_icm20948.h"
 #include <stdio.h>
 
 volatile uint32_t DEBUG_AliveCount = 0;
@@ -114,6 +115,7 @@ int main(void)
     Debug_USART1_Init(115200);
     Remote_Init();
     Debug_CaptureBootState();
+    Imu_Init();
     Actuator_Init();
 
     while (1)
@@ -121,6 +123,7 @@ int main(void)
         DEBUG_AliveCount++;
         DEBUG_PA2_Level = (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_2) != Bit_RESET) ? 1 : 0;
         now_us = Remote_GetUs();
+        Imu_Task();
         {
             uint8_t user_key_raw = (GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_0) != Bit_RESET) ? 1U : 0U;
 
@@ -136,6 +139,7 @@ int main(void)
                 user_key_stable = user_key_raw;
                 if (user_key_stable == 0U && DEBUG_LineFollowState == 0U)
                 {
+                    Actuator_OnUserStart();
                     LineFollow_SetEnabled(1U);
                     DEBUG_LineFollowState = 1U;
                     DEBUG_LineFollowEndUs = now_us + LINEFOLLOW_RUN_TIME_US;

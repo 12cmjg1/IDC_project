@@ -1,4 +1,5 @@
 #include "line_follow.h"
+#include "imu_icm20948.h"
 #include "remote.h"
 #include "misc.h"
 #include "stm32f4xx_adc.h"
@@ -21,6 +22,21 @@
 #define LINEFOLLOW_KP_DEN                1
 #define LINEFOLLOW_KD_NUM                4
 #define LINEFOLLOW_KD_DEN                1
+#define LINEFOLLOW_MODE_NORMAL           0U
+#define LINEFOLLOW_MODE_TURN             1U
+#define LINEFOLLOW_TURN_LEFT             (-1)
+#define LINEFOLLOW_TURN_RIGHT            1
+#define LINEFOLLOW_TURN_ERPM             7000
+#define LINEFOLLOW_TURN_DONE_DEG10       850
+#define LINEFOLLOW_TURN_TIMEOUT_US       2500000U
+#define LINEFOLLOW_TURN_REARM_US         800000U
+#define LINEFOLLOW_YAW_KP_NUM            8
+#define LINEFOLLOW_YAW_KP_DEN            1
+#define LINEFOLLOW_YAW_MAX_ERPM          3000
+#define LINEFOLLOW_YAW_ENABLE_POS        300
+#define LINEFOLLOW_ROUTE_COUNT           3U
+#define LINEFOLLOW_ROUTE_SIDE_LEFT       0U
+#define LINEFOLLOW_ROUTE_SIDE_RIGHT      1U
 
 volatile uint8_t LineFollow_Enabled = 0;
 volatile uint16_t LineFollow_Center = CCD_CENTER_PIXEL;
@@ -35,12 +51,91 @@ volatile uint32_t LineFollow_FrameCount = 0;
 volatile uint32_t LineFollow_CrossCount = 0;
 volatile uint32_t LineFollow_KeyToggleCount = 0;
 volatile uint8_t LineFollow_Reverse = 0;
+volatile uint8_t LineFollow_Mode = LINEFOLLOW_MODE_NORMAL;
+volatile int16_t LineFollow_YawCorrectionErpm = 0;
+volatile int8_t LineFollow_TurnDir = 0;
+volatile uint8_t LineFollow_TurnIndex = 0;
+volatile int16_t LineFollow_TurnYawDeltaDeg10 = 0;
+volatile uint32_t LineFollow_TurnDoneCount = 0;
+volatile uint8_t LineFollow_RouteSide = LINEFOLLOW_ROUTE_SIDE_LEFT;
 
 static uint16_t ccd_pixels[CCD_PIXEL_COUNT];
 static uint16_t ccd_pixels_flipped[CCD_PIXEL_COUNT];
 static int16_t last_position = 0;
 static uint32_t last_capture_us = 0;
 static uint32_t last_cross_us = 0;
+static uint32_t last_turn_us = 0;
+static uint32_t turn_start_us = 0;
+static int32_t yaw_ref_deg10 = 0;
+static int32_t turn_start_yaw_deg10 = 0;
+static const int8_t linefollow_route_left_start[LINEFOLLOW_ROUTE_COUNT] =
+{
+    LINEFOLLOW_TURN_RIGHT,
+    LINEFOLLOW_TURN_LEFT,
+    LINEFOLLOW_TURN_RIGHT
+};
+
+static const int8_t linefollow_route_right_start[LINEFOLLOW_ROUTE_COUNT] =
+{
+    LINEFOLLOW_TURN_LEFT,
+    LINEFOLLOW_TURN_RIGHT,
+    LINEFOLLOW_TURN_LEFT
+};
+
+static int32_t LineFollow_Abs32(int32_t value)
+{
+    return (value < 0) ? -value : value;
+}
+
+static int32_t LineFollow_Clamp32(int32_t value, int32_t min_value, int32_t max_value)
+{
+    if (value > max_value)
+    {
+        return max_value;
+    }
+    if (value < min_value)
+    {
+        return min_value;
+    }
+
+    return value;
+}
+
+static void LineFollow_StartTurn(uint32_t now_us)
+{
+    if (LineFollow_TurnIndex >= LINEFOLLOW_ROUTE_COUNT || Imu_Ready == 0U)
+    {
+        return;
+    }
+
+    LineFollow_Mode = LINEFOLLOW_MODE_TURN;
+    if (LineFollow_RouteSide == LINEFOLLOW_ROUTE_SIDE_RIGHT)
+    {
+        LineFollow_TurnDir = linefollow_route_right_start[LineFollow_TurnIndex];
+    }
+    else
+    {
+        LineFollow_TurnDir = linefollow_route_left_start[LineFollow_TurnIndex];
+    }
+    turn_start_yaw_deg10 = Imu_GetYawDeg10();
+    LineFollow_TurnYawDeltaDeg10 = 0;
+    turn_start_us = now_us;
+    last_turn_us = now_us;
+}
+
+static void LineFollow_StopTurn(void)
+{
+    LineFollow_Mode = LINEFOLLOW_MODE_NORMAL;
+    LineFollow_TurnDir = 0;
+    LineFollow_TurnIndex++;
+    LineFollow_TurnDoneCount++;
+    LineFollow_LeftCmdErpm = 0;
+    LineFollow_RightCmdErpm = 0;
+    LineFollow_YawCorrectionErpm = 0;
+    yaw_ref_deg10 = Imu_GetYawDeg10();
+    last_turn_us = Remote_GetUs();
+    last_position = 0;
+}
 
 static void LineFollow_SmallDelay(void)
 {
@@ -243,10 +338,24 @@ void LineFollow_SetEnabled(uint8_t enabled)
     LineFollow_Enabled = (enabled != 0U) ? 1U : 0U;
     LineFollow_KeyToggleCount++;
 
+    if (LineFollow_Enabled != 0U)
+    {
+        LineFollow_Mode = LINEFOLLOW_MODE_NORMAL;
+        LineFollow_TurnDir = 0;
+        LineFollow_TurnIndex = 0;
+        LineFollow_TurnYawDeltaDeg10 = 0;
+        LineFollow_YawCorrectionErpm = 0;
+        yaw_ref_deg10 = Imu_GetYawDeg10();
+        last_position = 0;
+    }
+
     if (LineFollow_Enabled == 0U)
     {
+        LineFollow_Mode = LINEFOLLOW_MODE_NORMAL;
+        LineFollow_TurnDir = 0;
         LineFollow_LeftCmdErpm = 0;
         LineFollow_RightCmdErpm = 0;
+        LineFollow_YawCorrectionErpm = 0;
     }
 }
 
@@ -257,6 +366,8 @@ void LineFollow_Task(uint16_t speed_scale)
     int32_t diff;
     int32_t left;
     int32_t right;
+    int32_t yaw_error;
+    int32_t yaw_correction;
     uint32_t now_us = Remote_GetUs();
 
     if ((uint32_t)(now_us - last_capture_us) >= LINEFOLLOW_CAPTURE_PERIOD_US)
@@ -286,12 +397,42 @@ void LineFollow_Task(uint16_t speed_scale)
             last_cross_us = now_us;
             LineFollow_CrossCount++;
         }
+
+        if (LineFollow_Mode == LINEFOLLOW_MODE_NORMAL &&
+            LineFollow_Cross != 0U &&
+            LineFollow_TurnIndex < LINEFOLLOW_ROUTE_COUNT &&
+            (uint32_t)(now_us - last_turn_us) >= LINEFOLLOW_TURN_REARM_US)
+        {
+            LineFollow_StartTurn(now_us);
+        }
     }
 
     if (LineFollow_Enabled == 0U || speed_scale == 0U)
     {
         LineFollow_LeftCmdErpm = 0;
         LineFollow_RightCmdErpm = 0;
+        LineFollow_YawCorrectionErpm = 0;
+        return;
+    }
+
+    if (LineFollow_Mode == LINEFOLLOW_MODE_TURN)
+    {
+        int32_t yaw_delta = Imu_GetYawDeltaDeg10(turn_start_yaw_deg10);
+        int32_t turn_progress = LineFollow_Abs32(yaw_delta);
+
+        LineFollow_TurnYawDeltaDeg10 = (int16_t)yaw_delta;
+
+        if (turn_progress >= LINEFOLLOW_TURN_DONE_DEG10 ||
+            (uint32_t)(now_us - turn_start_us) >= LINEFOLLOW_TURN_TIMEOUT_US ||
+            Imu_Ready == 0U)
+        {
+            LineFollow_StopTurn();
+            return;
+        }
+
+        LineFollow_LeftCmdErpm = (int16_t)((int32_t)LineFollow_TurnDir * LINEFOLLOW_TURN_ERPM);
+        LineFollow_RightCmdErpm = (int16_t)(-((int32_t)LineFollow_TurnDir * LINEFOLLOW_TURN_ERPM));
+        LineFollow_YawCorrectionErpm = 0;
         return;
     }
 
@@ -311,6 +452,23 @@ void LineFollow_Task(uint16_t speed_scale)
         diff = (int32_t)LineFollow_Position - (int32_t)last_position;
         steer_erpm = ((int32_t)LineFollow_Position * LINEFOLLOW_KP_NUM) / LINEFOLLOW_KP_DEN;
         steer_erpm += (diff * LINEFOLLOW_KD_NUM) / LINEFOLLOW_KD_DEN;
+
+        if (Imu_Ready != 0U && LineFollow_Cross == 0U &&
+            LineFollow_Abs32(LineFollow_Position) <= LINEFOLLOW_YAW_ENABLE_POS)
+        {
+            yaw_error = Imu_GetYawDeltaDeg10(yaw_ref_deg10);
+            yaw_correction = (yaw_error * LINEFOLLOW_YAW_KP_NUM) / LINEFOLLOW_YAW_KP_DEN;
+            yaw_correction = LineFollow_Clamp32(yaw_correction,
+                                                -LINEFOLLOW_YAW_MAX_ERPM,
+                                                LINEFOLLOW_YAW_MAX_ERPM);
+            steer_erpm += yaw_correction;
+            LineFollow_YawCorrectionErpm = (int16_t)yaw_correction;
+        }
+        else
+        {
+            yaw_ref_deg10 = Imu_GetYawDeg10();
+            LineFollow_YawCorrectionErpm = 0;
+        }
     }
 
     if (steer_erpm > LINEFOLLOW_STEER_MAX_ERPM)

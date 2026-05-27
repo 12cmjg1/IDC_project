@@ -1,4 +1,5 @@
-./objects/main.o: ..\USER\main.c ..\USER\stm32f4xx.h ..\CORE\core_cm4.h \
+./objects/imu_icm20948.o: ..\HARDWARE\IMU\imu_icm20948.c \
+  ..\HARDWARE\IMU\imu_icm20948.h ..\USER\stm32f4xx.h ..\CORE\core_cm4.h \
   ..\CORE\core_cmInstr.h ..\CORE\core_cmFunc.h ..\CORE\core_cm4_simd.h \
   ..\USER\system_stm32f4xx.h ..\CORE\arm_math.h ..\USER\stm32f4xx_conf.h \
   ..\FWLIB\inc\stm32f4xx_adc.h ..\FWLIB\inc\stm32f4xx_can.h \
@@ -8,6 +9,4 @@
   ..\FWLIB\inc\stm32f4xx_rcc.h ..\FWLIB\inc\stm32f4xx_spi.h \
   ..\FWLIB\inc\stm32f4xx_syscfg.h ..\FWLIB\inc\stm32f4xx_tim.h \
   ..\FWLIB\inc\stm32f4xx_usart.h ..\FWLIB\inc\misc.h \
-  ..\HARDWARE\REMOTE\remote.h ..\HARDWARE\ACTUATOR\actuator.h \
-  ..\HARDWARE\VESC_CAN\vesc_can.h ..\HARDWARE\LINE_FOLLOW\line_follow.h \
-  ..\HARDWARE\IMU\imu_icm20948.h
+  ..\HARDWARE\REMOTE\remote.h

@@ -24,7 +24,8 @@
 
 #define EMM5_DEFAULT_ADDR       3U
 #define EMM5_CHECK_BYTE         0x6BU
-#define EMM5_LIFT_SPEED_RPM     500U
+#define EMM5_LIFT_AUTO_SPEED_RPM 500U
+#define EMM5_LIFT_TRIM_SPEED_RPM 120U
 #define EMM5_LIFT_ACCEL         50U
 #define EMM5_DIR_UP             0U
 #define EMM5_DIR_DOWN           1U
@@ -32,8 +33,8 @@
 #define EMM5_LIFT_POS_LOW       0U
 #define EMM5_LIFT_POS_HIGH      5000U
 #define EMM5_LIFT_POS_MAX       7000U
-#define EMM5_LIFT_TRIM_STEP     300U
-#define EMM5_LIFT_TRIM_PERIOD_US 120000U
+#define EMM5_LIFT_TRIM_STEP     80U
+#define EMM5_LIFT_TRIM_PERIOD_US 250000U
 
 volatile int16_t Act_LeftMotor = 0;
 volatile int16_t Act_RightMotor = 0;
@@ -47,7 +48,22 @@ volatile int8_t Act_LiftMode = 0;
 volatile uint16_t Act_LiftPulseCount = EMM5_LIFT_TRIM_STEP;
 volatile uint32_t Act_LiftTriggerCount = 0;
 volatile uint8_t Act_VescEnable = 1;
+volatile uint8_t Act_DriveIdle = 0;
+volatile uint8_t Act_VescSendMode = 0;
 volatile uint32_t Act_LiftTargetPulse = EMM5_LIFT_POS_LOW;
+volatile uint32_t Act_Emm5TxCount = 0;
+volatile uint32_t Act_Emm5TxOkCount = 0;
+volatile uint32_t Act_Emm5TxFailCount = 0;
+volatile uint32_t Act_Emm5TxNoMailboxCount = 0;
+volatile uint32_t Act_Emm5TxTimeoutCount = 0;
+volatile uint32_t Act_Emm5LastExtId = 0;
+volatile uint8_t Act_Emm5LastLen = 0;
+volatile uint8_t Act_Emm5LastTxStatus = 0xFFU;
+volatile uint8_t Act_Emm5LastCmd = 0U;
+volatile uint8_t Act_Emm5Enabled = 0U;
+volatile uint32_t Act_LiftAutoApplyCount = 0U;
+volatile int8_t Act_LiftTrimState = 0;
+volatile uint32_t Act_LiftStopCount = 0U;
 
 static uint32_t vesc_last_tx_us = 0;
 static uint32_t drive_idle_start_us = 0;
@@ -159,6 +175,16 @@ static uint8_t RC_ToThreePosition(uint16_t pulse)
     return 1U;
 }
 
+static uint8_t RC_ToTwoPosition(uint16_t pulse, uint8_t fallback)
+{
+    if (pulse < 800U || pulse > 2200U)
+    {
+        return fallback;
+    }
+
+    return (pulse >= 1500U) ? 1U : 0U;
+}
+
 static void Actuator_DelayMs(uint32_t ms)
 {
     uint32_t start_us = Remote_GetUs();
@@ -224,9 +250,15 @@ static uint8_t Emm5_SendFrame(uint32_t ext_id, const uint8_t *data, uint8_t len)
     tx.Data[6] = (len > 6U) ? data[6] : 0U;
     tx.Data[7] = (len > 7U) ? data[7] : 0U;
 
+    Act_Emm5TxCount++;
+    Act_Emm5LastExtId = ext_id;
+    Act_Emm5LastLen = len;
+
     mailbox = CAN_Transmit(CAN1, &tx);
     if (mailbox > 2U)
     {
+        Act_Emm5LastTxStatus = 0xFFU;
+        Act_Emm5TxNoMailboxCount++;
         return 0U;
     }
 
@@ -236,14 +268,20 @@ static uint8_t Emm5_SendFrame(uint32_t ext_id, const uint8_t *data, uint8_t len)
         tx_status = CAN_TransmitStatus(CAN1, mailbox);
         if (tx_status == CAN_TxStatus_Ok)
         {
+            Act_Emm5LastTxStatus = tx_status;
+            Act_Emm5TxOkCount++;
             return 1U;
         }
         if (tx_status == CAN_TxStatus_Failed)
         {
+            Act_Emm5LastTxStatus = tx_status;
+            Act_Emm5TxFailCount++;
             return 0U;
         }
     } while ((uint32_t)(Remote_GetUs() - start_us) < 100000U);
 
+    Act_Emm5LastTxStatus = tx_status;
+    Act_Emm5TxTimeoutCount++;
     return 0U;
 }
 
@@ -260,6 +298,8 @@ static uint8_t Emm5_SendCmdExt(const uint8_t *cmd, uint8_t len)
     {
         return 0U;
     }
+
+    Act_Emm5LastCmd = cmd[1];
 
     while (i < (uint8_t)(len - 2U))
     {
@@ -308,6 +348,7 @@ static void Emm5_Enable(uint8_t enable)
     cmd[5] = EMM5_CHECK_BYTE;
     Emm5_SendCmdExt(cmd, 6U);
     emm5_enabled = enable;
+    Act_Emm5Enabled = enable;
 }
 
 static void Emm5_ResetZero(void)
@@ -321,15 +362,15 @@ static void Emm5_ResetZero(void)
     Emm5_SendCmdExt(cmd, 4U);
 }
 
-static void Emm5_PosControl(uint8_t dir, uint32_t pulses, uint8_t absolute_pos)
+static void Emm5_PosControl(uint8_t dir, uint32_t pulses, uint8_t absolute_pos, uint16_t speed_rpm)
 {
     uint8_t cmd[13];
 
     cmd[0] = EMM5_DEFAULT_ADDR;
     cmd[1] = 0xFDU;
     cmd[2] = dir;
-    cmd[3] = (uint8_t)(EMM5_LIFT_SPEED_RPM >> 8);
-    cmd[4] = (uint8_t)(EMM5_LIFT_SPEED_RPM >> 0);
+    cmd[3] = (uint8_t)(speed_rpm >> 8);
+    cmd[4] = (uint8_t)(speed_rpm >> 0);
     cmd[5] = (uint8_t)EMM5_LIFT_ACCEL;
     cmd[6] = (uint8_t)(pulses >> 24);
     cmd[7] = (uint8_t)(pulses >> 16);
@@ -351,7 +392,7 @@ static uint32_t Actuator_ClampLiftTarget(uint32_t target)
     return target;
 }
 
-static void Emm5_MoveAbsolute(uint32_t target)
+static void Emm5_MoveAbsoluteWithSpeed(uint32_t target, uint16_t speed_rpm)
 {
     uint8_t dir;
 
@@ -368,11 +409,44 @@ static void Emm5_MoveAbsolute(uint32_t target)
     }
 
     dir = (target >= Act_LiftTargetPulse) ? EMM5_DIR_UP : EMM5_DIR_DOWN;
-    Emm5_PosControl(dir, target, 1U);
+    Emm5_PosControl(dir, target, 1U, speed_rpm);
     Act_LiftTargetPulse = target;
     Act_LiftMode = (dir == EMM5_DIR_UP) ? 1 : -1;
     Act_LiftSpeed = (dir == EMM5_DIR_UP) ? 1000 : -1000;
     Act_LiftTriggerCount++;
+}
+
+static void Emm5_MoveAbsolute(uint32_t target)
+{
+    Emm5_MoveAbsoluteWithSpeed(target, EMM5_LIFT_AUTO_SPEED_RPM);
+}
+
+static void Emm5_Stop(void)
+{
+    if (emm5_enabled != 0U)
+    {
+        Emm5_Enable(0U);
+    }
+
+    Act_LiftMode = 0;
+    Act_LiftSpeed = 0;
+    Act_LiftTrimState = 0;
+    Act_LiftStopCount++;
+}
+
+static void Actuator_ApplyLiftSwitch(uint8_t lift_pos)
+{
+    lift_last_pos = lift_pos;
+    Act_LiftAutoApplyCount++;
+
+    if (lift_pos != 0U)
+    {
+        Emm5_MoveAbsolute(EMM5_LIFT_POS_HIGH);
+    }
+    else
+    {
+        Emm5_MoveAbsolute(EMM5_LIFT_POS_LOW);
+    }
 }
 
 static void Emm5_Init(void)
@@ -395,6 +469,18 @@ void Actuator_Init(void)
     LineFollow_Init();
 }
 
+void Actuator_OnUserStart(void)
+{
+    uint8_t lift_pos = RC_ToTwoPosition(RC_CH[5], lift_last_pos);
+
+    if (lift_switch_ready == 0U)
+    {
+        lift_switch_ready = 1U;
+    }
+
+    Actuator_ApplyLiftSwitch(lift_pos);
+}
+
 void Actuator_UpdateFromRC(void)
 {
     uint32_t now_us = Remote_GetUs();
@@ -407,7 +493,7 @@ void Actuator_UpdateFromRC(void)
     uint16_t speed_scale = RC_ToSpeedScale(RC_CH[2]);
     uint8_t lift_trim_pos = RC_ToThreePosition(RC_CH[3]);
     uint8_t gripper_pos = RC_ToThreePosition(RC_CH[4]);
-    uint8_t lift_pos = RC_ToThreePosition(RC_CH[5]);
+    uint8_t lift_pos = RC_ToTwoPosition(RC_CH[5], lift_last_pos);
     int32_t scaled_move = ((int32_t)move_cmd * speed_scale) / 1000;
     int32_t scaled_turn = ((int32_t)turn_cmd * speed_scale) / 1000;
     int32_t left;
@@ -503,16 +589,7 @@ void Actuator_UpdateFromRC(void)
     }
     else if (lift_pos != lift_last_pos)
     {
-        lift_last_pos = lift_pos;
-
-        if (lift_pos == 2U)
-        {
-            Emm5_MoveAbsolute(EMM5_LIFT_POS_HIGH);
-        }
-        else if (lift_pos == 0U)
-        {
-            Emm5_MoveAbsolute(EMM5_LIFT_POS_LOW);
-        }
+        Actuator_ApplyLiftSwitch(lift_pos);
     }
 
     if (lift_trim_pos == 0U || lift_trim_pos == 2U)
@@ -522,18 +599,22 @@ void Actuator_UpdateFromRC(void)
         {
             if (lift_trim_pos == 0U)
             {
+                Act_LiftTrimState = -1;
                 if (Act_LiftTargetPulse > Act_LiftPulseCount)
                 {
-                    Emm5_MoveAbsolute(Act_LiftTargetPulse - Act_LiftPulseCount);
+                    Emm5_MoveAbsoluteWithSpeed(Act_LiftTargetPulse - Act_LiftPulseCount,
+                                               EMM5_LIFT_TRIM_SPEED_RPM);
                 }
                 else
                 {
-                    Emm5_MoveAbsolute(EMM5_LIFT_POS_LOW);
+                    Emm5_MoveAbsoluteWithSpeed(0U, EMM5_LIFT_TRIM_SPEED_RPM);
                 }
             }
             else
             {
-                Emm5_MoveAbsolute(Act_LiftTargetPulse + Act_LiftPulseCount);
+                Act_LiftTrimState = 1;
+                Emm5_MoveAbsoluteWithSpeed(Act_LiftTargetPulse + Act_LiftPulseCount,
+                                           EMM5_LIFT_TRIM_SPEED_RPM);
             }
 
             lift_trim_last_us = now_us;
@@ -541,9 +622,7 @@ void Actuator_UpdateFromRC(void)
     }
     else if (lift_trim_pos == 1U && lift_trim_last_pos != 1U)
     {
-        Emm5_Enable(0U);
-        Act_LiftMode = 0;
-        Act_LiftSpeed = 0;
+        Emm5_Stop();
     }
 
     lift_trim_last_pos = lift_trim_pos;
@@ -559,6 +638,7 @@ void Actuator_Task(void)
         vesc_last_tx_us = now_us;
 
         drive_idle = (Act_LeftMotor == 0 && Act_RightMotor == 0 && LineFollow_IsEnabled() == 0U) ? 1U : 0U;
+        Act_DriveIdle = drive_idle;
 
         if (drive_idle != 0U)
         {
@@ -569,11 +649,13 @@ void Actuator_Task(void)
 
             if ((uint32_t)(now_us - drive_idle_start_us) >= VESC_BRAKE_HOLD_DELAY_US)
             {
+                Act_VescSendMode = 2U;
                 VescCan_SetBrakeCurrent(VESC_CAN_LEFT_ID, VESC_BRAKE_HOLD_CURRENT_MA);
                 VescCan_SetBrakeCurrent(VESC_CAN_RIGHT_ID, VESC_BRAKE_HOLD_CURRENT_MA);
             }
             else
             {
+                Act_VescSendMode = 1U;
                 VescCan_SetRpm(VESC_CAN_LEFT_ID, 0);
                 VescCan_SetRpm(VESC_CAN_RIGHT_ID, 0);
             }
@@ -581,6 +663,7 @@ void Actuator_Task(void)
         else
         {
             drive_idle_start_us = 0U;
+            Act_VescSendMode = 1U;
             VescCan_SetRpm(VESC_CAN_LEFT_ID, Act_LeftMotor);
             VescCan_SetRpm(VESC_CAN_RIGHT_ID, Act_RightMotor);
         }

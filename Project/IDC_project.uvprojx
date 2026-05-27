@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,ARM_MATH_CM4</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\USER;..\FWLIB\inc;..\HARDWARE\REMOTE;..\HARDWARE\ACTUATOR;..\HARDWARE\VESC_CAN;..\HARDWARE\LINE_FOLLOW</IncludePath>
+              <IncludePath>..\CORE;..\USER;..\FWLIB\inc;..\HARDWARE\REMOTE;..\HARDWARE\ACTUATOR;..\HARDWARE\VESC_CAN;..\HARDWARE\LINE_FOLLOW;..\HARDWARE\IMU</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -458,6 +458,11 @@
               <FileName>line_follow.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\LINE_FOLLOW\line_follow.c</FilePath>
+            </File>
+            <File>
+              <FileName>imu_icm20948.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\IMU\imu_icm20948.c</FilePath>
             </File>
             <File>
               <FileName>stm32f4xx_can.c</FileName>

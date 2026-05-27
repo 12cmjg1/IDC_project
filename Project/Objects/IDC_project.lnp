@@ -14,6 +14,7 @@
 ".\objects\stm32f4xx_tim.o"
 ".\objects\vesc_can.o"
 ".\objects\line_follow.o"
+".\objects\imu_icm20948.o"
 ".\objects\stm32f4xx_can.o"
 ".\objects\stm32f4xx_adc.o"
 --strict --scatter ".\Objects\IDC_project.sct"

@@ -1,386 +1,413 @@
 Dependencies for Project 'IDC_project', Target 'Target_1': (DO NOT MODIFY !)
 CompilerVersion: 6240000::V6.24::ARMCLANG
-F (..\CORE\startup_stm32f40_41xxx.s)(0x6A0F2BA2)(--target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -masm=auto  -Wa,armasm,--diag_suppress=A1950W -c-gdwarf-4-Wa,armasm,--pd,"__UVISION_VERSION SETA 543" -Wa,armasm,--pd,"STM32F407xx SETA 1"-o ./objects/startup_stm32f40_41xxx.o)
-F (..\USER\system_stm32f4xx.c)(0x6916B11E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/system_stm32f4xx.o -MMD)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-F (..\USER\stm32f4xx_it.c)(0x6A07EC16)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_it.o -MMD)
-I (..\USER\stm32f4xx_it.h)(0x69C7E0D0)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-I (..\HARDWARE\REMOTE\remote.h)(0x6A07EBF4)
-I (..\HARDWARE\VESC_CAN\vesc_can.h)(0x6A0EFD33)
-F (..\USER\main.c)(0x6A0ADB97)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/main.o -MMD)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-I (..\HARDWARE\REMOTE\remote.h)(0x6A07EBF4)
-I (..\HARDWARE\ACTUATOR\actuator.h)(0x6A0EF795)
-I (..\HARDWARE\VESC_CAN\vesc_can.h)(0x6A0EFD33)
-I (..\HARDWARE\LINE_FOLLOW\line_follow.h)(0x6A0EED5B)
-F (..\HARDWARE\REMOTE\remote.c)(0x6A07EC10)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/remote.o -MMD)
-I (..\HARDWARE\REMOTE\remote.h)(0x6A07EBF4)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-F (..\FWLIB\src\misc.c)(0x6916B11E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/misc.o -MMD)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-F (..\FWLIB\src\stm32f4xx_gpio.c)(0x6916B11E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_gpio.o -MMD)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-F (..\FWLIB\src\stm32f4xx_rcc.c)(0x6916B11E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_rcc.o -MMD)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-F (..\FWLIB\src\stm32f4xx_syscfg.c)(0x6916B11E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_syscfg.o -MMD)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-F (..\FWLIB\src\stm32f4xx_exti.c)(0x6916B11E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_exti.o -MMD)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-F (..\FWLIB\src\stm32f4xx_usart.c)(0x6916B11E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_usart.o -MMD)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-F (..\HARDWARE\ACTUATOR\actuator.c)(0x6A0F0E09)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/actuator.o -MMD)
-I (..\HARDWARE\ACTUATOR\actuator.h)(0x6A0EF795)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-I (..\HARDWARE\LINE_FOLLOW\line_follow.h)(0x6A0EED5B)
-I (..\HARDWARE\REMOTE\remote.h)(0x6A07EBF4)
-I (..\HARDWARE\VESC_CAN\vesc_can.h)(0x6A0EFD33)
-F (..\FWLIB\src\stm32f4xx_tim.c)(0x6916B11E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_tim.o -MMD)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-F (..\HARDWARE\VESC_CAN\vesc_can.c)(0x6A0EFD33)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/vesc_can.o -MMD)
-I (..\HARDWARE\VESC_CAN\vesc_can.h)(0x6A0EFD33)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-F (..\HARDWARE\LINE_FOLLOW\line_follow.c)(0x6A0F093F)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/line_follow.o -MMD)
-I (..\HARDWARE\LINE_FOLLOW\line_follow.h)(0x6A0EED5B)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-I (..\HARDWARE\REMOTE\remote.h)(0x6A07EBF4)
-F (..\FWLIB\src\stm32f4xx_can.c)(0x6916B11E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_can.o -MMD)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
-F (..\FWLIB\src\stm32f4xx_adc.c)(0x6916B11E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_adc.o -MMD)
-I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6916B11E)
-I (..\USER\stm32f4xx.h)(0x6916B11E)
-I (..\CORE\core_cm4.h)(0x6916B11E)
-I (..\CORE\core_cmInstr.h)(0x6916B11E)
-I (..\CORE\core_cmFunc.h)(0x6A02FA05)
-I (..\CORE\core_cm4_simd.h)(0x6916B11E)
-I (..\USER\system_stm32f4xx.h)(0x6916B11E)
-I (..\CORE\arm_math.h)(0x6916B11E)
-I (..\USER\stm32f4xx_conf.h)(0x6A02FA02)
-I (..\FWLIB\inc\stm32f4xx_can.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6916B11E)
-I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6916B11E)
-I (..\FWLIB\inc\misc.h)(0x6916B11E)
+F (..\CORE\startup_stm32f40_41xxx.s)(0x6A152358)(--target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -masm=auto  -Wa,armasm,--diag_suppress=A1950W -c-gdwarf-4-Wa,armasm,--pd,"__UVISION_VERSION SETA 543" -Wa,armasm,--pd,"STM32F407xx SETA 1"-o ./objects/startup_stm32f40_41xxx.o)
+F (..\USER\system_stm32f4xx.c)(0x6A100985)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/system_stm32f4xx.o -MMD)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+F (..\USER\stm32f4xx_it.c)(0x6A100985)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_it.o -MMD)
+I (..\USER\stm32f4xx_it.h)(0x6A100985)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+I (..\HARDWARE\REMOTE\remote.h)(0x6A0FF15B)
+I (..\HARDWARE\VESC_CAN\vesc_can.h)(0x6A100985)
+F (..\USER\main.c)(0x6A16DD3D)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/main.o -MMD)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+I (..\HARDWARE\REMOTE\remote.h)(0x6A0FF15B)
+I (..\HARDWARE\ACTUATOR\actuator.h)(0x6A16DD35)
+I (..\HARDWARE\VESC_CAN\vesc_can.h)(0x6A100985)
+I (..\HARDWARE\LINE_FOLLOW\line_follow.h)(0x6A16D98B)
+I (..\HARDWARE\IMU\imu_icm20948.h)(0x6A16D6D4)
+F (..\HARDWARE\REMOTE\remote.c)(0x6A0FF15B)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/remote.o -MMD)
+I (..\HARDWARE\REMOTE\remote.h)(0x6A0FF15B)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+F (..\FWLIB\src\misc.c)(0x6A100985)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/misc.o -MMD)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+F (..\FWLIB\src\stm32f4xx_gpio.c)(0x6A100985)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_gpio.o -MMD)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+F (..\FWLIB\src\stm32f4xx_rcc.c)(0x6A100985)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_rcc.o -MMD)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+F (..\FWLIB\src\stm32f4xx_syscfg.c)(0x6A100985)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_syscfg.o -MMD)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+F (..\FWLIB\src\stm32f4xx_exti.c)(0x6A100985)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_exti.o -MMD)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+F (..\FWLIB\src\stm32f4xx_usart.c)(0x6A100985)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_usart.o -MMD)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+F (..\HARDWARE\ACTUATOR\actuator.c)(0x6A16DD27)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/actuator.o -MMD)
+I (..\HARDWARE\ACTUATOR\actuator.h)(0x6A16DD35)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+I (..\HARDWARE\LINE_FOLLOW\line_follow.h)(0x6A16D98B)
+I (..\HARDWARE\REMOTE\remote.h)(0x6A0FF15B)
+I (..\HARDWARE\VESC_CAN\vesc_can.h)(0x6A100985)
+F (..\FWLIB\src\stm32f4xx_tim.c)(0x6A100985)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_tim.o -MMD)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+F (..\HARDWARE\VESC_CAN\vesc_can.c)(0x6A100985)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/vesc_can.o -MMD)
+I (..\HARDWARE\VESC_CAN\vesc_can.h)(0x6A100985)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+F (..\HARDWARE\LINE_FOLLOW\line_follow.c)(0x6A16D997)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/line_follow.o -MMD)
+I (..\HARDWARE\LINE_FOLLOW\line_follow.h)(0x6A16D98B)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+I (..\HARDWARE\IMU\imu_icm20948.h)(0x6A16D6D4)
+I (..\HARDWARE\REMOTE\remote.h)(0x6A0FF15B)
+F (..\HARDWARE\IMU\imu_icm20948.c)(0x6A16D722)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/imu_icm20948.o -MMD)
+I (..\HARDWARE\IMU\imu_icm20948.h)(0x6A16D6D4)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+I (..\HARDWARE\REMOTE\remote.h)(0x6A0FF15B)
+F (..\FWLIB\src\stm32f4xx_can.c)(0x6A100985)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_can.o -MMD)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)
+F (..\FWLIB\src\stm32f4xx_adc.c)(0x6A100985)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-4 -O0 -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../CORE -I ../USER -I ../FWLIB/inc -I ../HARDWARE/REMOTE -I ../HARDWARE/ACTUATOR -I ../HARDWARE/VESC_CAN -I ../HARDWARE/LINE_FOLLOW -I ../HARDWARE/IMU-D__UVISION_VERSION="543" -DSTM32F407xx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4-o ./objects/stm32f4xx_adc.o -MMD)
+I (..\FWLIB\inc\stm32f4xx_adc.h)(0x6A100985)
+I (..\USER\stm32f4xx.h)(0x6A100985)
+I (..\CORE\core_cm4.h)(0x6A100985)
+I (..\CORE\core_cmInstr.h)(0x6A100985)
+I (..\CORE\core_cmFunc.h)(0x6A100985)
+I (..\CORE\core_cm4_simd.h)(0x6A100985)
+I (..\USER\system_stm32f4xx.h)(0x6A100985)
+I (..\CORE\arm_math.h)(0x6A100985)
+I (..\USER\stm32f4xx_conf.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_can.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_dma.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_flash.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_gpio.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_i2c.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_exti.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_pwr.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_rcc.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_spi.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_syscfg.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_tim.h)(0x6A100985)
+I (..\FWLIB\inc\stm32f4xx_usart.h)(0x6A100985)
+I (..\FWLIB\inc\misc.h)(0x6A100985)

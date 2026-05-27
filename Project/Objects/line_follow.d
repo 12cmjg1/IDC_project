@@ -9,4 +9,5 @@
   ..\FWLIB\inc\stm32f4xx_pwr.h ..\FWLIB\inc\stm32f4xx_rcc.h \
   ..\FWLIB\inc\stm32f4xx_spi.h ..\FWLIB\inc\stm32f4xx_syscfg.h \
   ..\FWLIB\inc\stm32f4xx_tim.h ..\FWLIB\inc\stm32f4xx_usart.h \
-  ..\FWLIB\inc\misc.h ..\HARDWARE\REMOTE\remote.h
+  ..\FWLIB\inc\misc.h ..\HARDWARE\IMU\imu_icm20948.h \
+  ..\HARDWARE\REMOTE\remote.h

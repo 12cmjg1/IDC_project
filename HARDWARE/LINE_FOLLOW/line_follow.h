@@ -21,5 +21,12 @@ extern volatile uint32_t LineFollow_FrameCount;
 extern volatile uint32_t LineFollow_CrossCount;
 extern volatile uint32_t LineFollow_KeyToggleCount;
 extern volatile uint8_t LineFollow_Reverse;
+extern volatile uint8_t LineFollow_Mode;
+extern volatile int16_t LineFollow_YawCorrectionErpm;
+extern volatile int8_t LineFollow_TurnDir;
+extern volatile uint8_t LineFollow_TurnIndex;
+extern volatile int16_t LineFollow_TurnYawDeltaDeg10;
+extern volatile uint32_t LineFollow_TurnDoneCount;
+extern volatile uint8_t LineFollow_RouteSide;
 
 #endif
