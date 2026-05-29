@@ -42,6 +42,11 @@ void EXTI0_IRQHandler(void)
     Remote_EXTI0_IRQHandler();
 }
 
+void EXTI1_IRQHandler(void)
+{
+    Remote_EXTI1_IRQHandler();
+}
+
 void EXTI3_IRQHandler(void)
 {
     Remote_EXTI3_IRQHandler();

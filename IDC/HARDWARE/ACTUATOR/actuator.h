@@ -20,5 +20,7 @@ extern volatile uint16_t Act_LiftPulseCount;
 extern volatile uint32_t Act_LiftTargetPulse;
 extern volatile uint32_t Act_LiftTriggerCount;
 extern volatile uint8_t Act_VescEnable;
+extern volatile int16_t Act_LiftJogCmd;
+extern volatile uint8_t Act_PlatformMode;
 
 #endif

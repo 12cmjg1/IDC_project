@@ -32,7 +32,7 @@ static const RC_InputDef rc_inputs[RC_CHANNEL_COUNT] =
     {GPIOA, GPIO_Pin_3, EXTI_PortSourceGPIOA, EXTI_PinSource3, EXTI_Line3},
     {GPIOA, GPIO_Pin_6, EXTI_PortSourceGPIOA, EXTI_PinSource6, EXTI_Line6},
     {GPIOA, GPIO_Pin_7, EXTI_PortSourceGPIOA, EXTI_PinSource7, EXTI_Line7},
-    {GPIOA, GPIO_Pin_8, EXTI_PortSourceGPIOA, EXTI_PinSource8, EXTI_Line8},
+    {GPIOC, GPIO_Pin_1, EXTI_PortSourceGPIOC, EXTI_PinSource1, EXTI_Line1},
     {GPIOC, GPIO_Pin_0, EXTI_PortSourceGPIOC, EXTI_PinSource0, EXTI_Line0},
 };
 
@@ -130,14 +130,14 @@ static void Remote_GPIO_EXTI_Init(void)
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOC, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_6 | GPIO_Pin_7;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
     GPIO_Init(GPIOC, &GPIO_InitStructure);
 
     for (i = 0; i < RC_CHANNEL_COUNT; i++)
@@ -161,6 +161,9 @@ static void Remote_NVIC_Init(void)
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 
     NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
+    NVIC_Init(&NVIC_InitStructure);
+
+    NVIC_InitStructure.NVIC_IRQChannel = EXTI1_IRQn;
     NVIC_Init(&NVIC_InitStructure);
 
     NVIC_InitStructure.NVIC_IRQChannel = EXTI2_IRQn;
@@ -229,6 +232,11 @@ void Remote_EXTI0_IRQHandler(void)
     Remote_HandleChannel(5);
 }
 
+void Remote_EXTI1_IRQHandler(void)
+{
+    Remote_HandleChannel(4);
+}
+
 void Remote_EXTI2_IRQHandler(void)
 {
     Remote_HandleChannel(0);
@@ -243,7 +251,6 @@ void Remote_EXTI9_5_IRQHandler(void)
 {
     Remote_HandleChannel(2);
     Remote_HandleChannel(3);
-    Remote_HandleChannel(4);
 }
 
 void Remote_TIM10_IRQHandler(void)

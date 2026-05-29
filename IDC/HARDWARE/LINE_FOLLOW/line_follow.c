@@ -12,14 +12,14 @@
 #define LINEFOLLOW_CAPTURE_PERIOD_US     10000U
 #define LINEFOLLOW_CROSS_THRESHOLD       30U
 #define LINEFOLLOW_LOST_WIDTH_THRESHOLD  4U
-#define LINEFOLLOW_BASE_ERPM_MAX         12000
-#define LINEFOLLOW_STEER_MAX_ERPM        9000
-#define LINEFOLLOW_LOST_STEER_ERPM       6000
-#define LINEFOLLOW_OUTPUT_ERPM_MAX       16000
-#define LINEFOLLOW_FORWARD_SIGN          (-1)
-#define LINEFOLLOW_KP_NUM                10
+#define LINEFOLLOW_BASE_ERPM_MAX         9000
+#define LINEFOLLOW_STEER_MAX_ERPM        3500
+#define LINEFOLLOW_LOST_STEER_ERPM       2500
+#define LINEFOLLOW_OUTPUT_ERPM_MAX       12000
+#define LINEFOLLOW_FORWARD_SIGN          (1)
+#define LINEFOLLOW_KP_NUM                3
 #define LINEFOLLOW_KP_DEN                1
-#define LINEFOLLOW_KD_NUM                4
+#define LINEFOLLOW_KD_NUM                0
 #define LINEFOLLOW_KD_DEN                1
 
 volatile uint8_t LineFollow_Enabled = 0;
@@ -309,7 +309,7 @@ void LineFollow_Task(uint16_t speed_scale)
     else
     {
         diff = (int32_t)LineFollow_Position - (int32_t)last_position;
-        steer_erpm = ((int32_t)LineFollow_Position * LINEFOLLOW_KP_NUM) / LINEFOLLOW_KP_DEN;
+        steer_erpm = -((int32_t)LineFollow_Position * LINEFOLLOW_KP_NUM) / LINEFOLLOW_KP_DEN;
         steer_erpm += (diff * LINEFOLLOW_KD_NUM) / LINEFOLLOW_KD_DEN;
     }
 

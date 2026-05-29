@@ -8,11 +8,13 @@
 #define RC_RESTART_DEADZONE_US  120
 #define RC_SWITCH_LOW_US        1300U
 #define RC_SWITCH_HIGH_US       1700U
+#define LINEFOLLOW_MIN_SPEED_SCALE 350U
 
-#define SERVO_PULSE_MIN_US      500U
+#define SERVO_PULSE_MIN_US      550U
 #define SERVO_PULSE_MAX_US      2500U
+#define SERVO_FULL_OPEN_US      SERVO_PULSE_MIN_US
 #define SERVO_OPEN_US           1500U
-#define SERVO_START_OPEN_US     SERVO_PULSE_MAX_US
+#define SERVO_START_OPEN_US     SERVO_PULSE_MIN_US
 #define SERVO_TENNIS_US         2278U
 #define SERVO_GOLF_US           1944U
 
@@ -35,6 +37,12 @@
 #define EMM5_LIFT_POS_WORK      5000U
 #define EMM5_LIFT_POS_BOTTOM_MAX 7000U
 #define EMM5_LIFT_TRIM_STEP     300U
+#define EMM5_LIFT_JOG_PERIOD_US 120000U
+#define EMM5_LIFT_JOG_MIN_STEP  80U
+#define EMM5_LIFT_JOG_MAX_STEP  500U
+
+#define PLATFORM_MODE_FLAT      0U
+#define PLATFORM_MODE_CLIMB     2U
 
 volatile int16_t Act_LeftMotor = 0;
 volatile int16_t Act_RightMotor = 0;
@@ -49,15 +57,15 @@ volatile uint16_t Act_LiftPulseCount = EMM5_LIFT_TRIM_STEP;
 volatile uint32_t Act_LiftTriggerCount = 0;
 volatile uint8_t Act_VescEnable = 1;
 volatile uint32_t Act_LiftTargetPulse = EMM5_LIFT_POS_TOP;
+volatile int16_t Act_LiftJogCmd = 0;
+volatile uint8_t Act_PlatformMode = PLATFORM_MODE_FLAT;
 
 extern volatile uint8_t DEBUG_LineFollowState;
 
 static uint32_t vesc_last_tx_us = 0;
+static uint32_t lift_jog_last_us = 0;
 static uint32_t brake_hold_idle_start_us = 0;
 static int32_t brake_hold_current_mA = 0;
-static uint8_t lift_switch_ready = 0;
-static uint8_t lift_last_pos = 1U;
-static uint8_t lift_trim_last_pos = 1U;
 static uint8_t drive_stop_latched = 1U;
 static uint8_t emm5_enabled = 0U;
 static uint8_t gripper_signal_seen = 0U;
@@ -379,6 +387,67 @@ static void Emm5_MoveAbsolute(uint32_t target)
     Act_LiftTriggerCount++;
 }
 
+static void Emm5_Jog(int16_t cmd)
+{
+    uint32_t now_us;
+    uint32_t abs_cmd;
+    uint32_t step;
+    uint32_t target;
+
+    if (cmd == 0)
+    {
+        lift_jog_last_us = 0U;
+        if (emm5_enabled != 0U)
+        {
+            Emm5_Enable(0U);
+        }
+        Act_LiftMode = 0;
+        Act_LiftSpeed = 0;
+        return;
+    }
+
+    now_us = Remote_GetUs();
+    if (lift_jog_last_us != 0U &&
+        (uint32_t)(now_us - lift_jog_last_us) < EMM5_LIFT_JOG_PERIOD_US)
+    {
+        return;
+    }
+    lift_jog_last_us = now_us;
+
+    if (emm5_enabled == 0U)
+    {
+        Emm5_Enable(1U);
+        Actuator_DelayMs(2U);
+    }
+
+    abs_cmd = (cmd > 0) ? (uint32_t)cmd : (uint32_t)(-cmd);
+    step = EMM5_LIFT_JOG_MIN_STEP +
+           ((EMM5_LIFT_JOG_MAX_STEP - EMM5_LIFT_JOG_MIN_STEP) * abs_cmd) / 1000U;
+
+    if (cmd > 0)
+    {
+        target = Actuator_ClampLiftTarget(Act_LiftTargetPulse + step);
+    }
+    else if (Act_LiftTargetPulse > step)
+    {
+        target = Act_LiftTargetPulse - step;
+    }
+    else
+    {
+        target = EMM5_LIFT_POS_TOP;
+    }
+
+    if (target == Act_LiftTargetPulse)
+    {
+        Act_LiftMode = 0;
+        Act_LiftSpeed = 0;
+        return;
+    }
+
+    Emm5_MoveAbsolute(target);
+    Act_LiftSpeed = cmd;
+}
+
 static void Emm5_Init(void)
 {
     Actuator_DelayMs(EMM5_INIT_DELAY_MS);
@@ -407,10 +476,12 @@ void Actuator_UpdateFromRC(void)
     uint8_t turn_near_center = RC_IsNearCenter(RC_CH[0], RC_STOP_DEADZONE_US);
     uint8_t move_leave_center = RC_IsNearCenter(RC_CH[1], RC_RESTART_DEADZONE_US);
     uint8_t turn_leave_center = RC_IsNearCenter(RC_CH[0], RC_RESTART_DEADZONE_US);
+
     uint16_t speed_scale = RC_ToSpeedScale(RC_CH[2]);
-    uint8_t lift_trim_pos = RC_ToThreePosition(RC_CH[3]);
+    int16_t lift_jog_cmd = RC_ToCenteredSigned(RC_CH[3]);
     uint8_t gripper_pos = RC_ToThreePosition(RC_CH[4]);
-    uint8_t lift_pos = RC_ToThreePosition(RC_CH[5]);
+    uint8_t platform_mode = RC_ToThreePosition(RC_CH[5]);
+    uint16_t linefollow_speed_scale;
     int32_t scaled_move = ((int32_t)move_cmd * speed_scale) / 1000;
     int32_t scaled_turn = ((int32_t)turn_cmd * speed_scale) / 1000;
     int32_t left;
@@ -468,8 +539,15 @@ void Actuator_UpdateFromRC(void)
     Act_TurnCmd = turn_cmd;
     Act_SpeedScale = speed_scale;
     Act_GripperMode = gripper_pos;
+    Act_LiftJogCmd = lift_jog_cmd;
+    Act_PlatformMode = platform_mode;
 
-    LineFollow_Task(speed_scale);
+    linefollow_speed_scale = speed_scale;
+    if (LineFollow_IsEnabled() != 0U && linefollow_speed_scale < LINEFOLLOW_MIN_SPEED_SCALE)
+    {
+        linefollow_speed_scale = LINEFOLLOW_MIN_SPEED_SCALE;
+    }
+    LineFollow_Task(linefollow_speed_scale);
 
     if (LineFollow_IsEnabled() != 0U)
     {
@@ -482,9 +560,9 @@ void Actuator_UpdateFromRC(void)
         Act_RightMotor = (int16_t)((((int32_t)right * VESC_MAX_ERPM) / 1000) * VESC_RIGHT_SIGN);
     }
 
-    if (DEBUG_LineFollowState != 0U || LineFollow_IsEnabled() != 0U)
+    if (platform_mode == PLATFORM_MODE_CLIMB)
     {
-        Act_GripperPulse = SERVO_START_OPEN_US;
+        Act_GripperPulse = SERVO_FULL_OPEN_US;
     }
     else
     {
@@ -517,53 +595,7 @@ void Actuator_UpdateFromRC(void)
 
     TIM3->CCR1 = RC_ToServoPulse(Act_GripperPulse);
 
-    if (lift_switch_ready == 0U)
-    {
-        lift_last_pos = lift_pos;
-        lift_trim_last_pos = lift_trim_pos;
-        lift_switch_ready = 1U;
-    }
-    else if (lift_pos != lift_last_pos)
-    {
-        lift_last_pos = lift_pos;
-
-        if (lift_pos == 2U)
-        {
-            Emm5_MoveAbsolute(EMM5_LIFT_POS_WORK);
-        }
-        else if (lift_pos == 0U)
-        {
-            Emm5_MoveAbsolute(EMM5_LIFT_POS_TOP);
-        }
-    }
-
-    if ((lift_trim_pos == 0U || lift_trim_pos == 2U) &&
-        lift_trim_pos != lift_trim_last_pos)
-    {
-        if (lift_trim_pos == 0U)
-        {
-            if (Act_LiftTargetPulse > Act_LiftPulseCount)
-            {
-                Emm5_MoveAbsolute(Act_LiftTargetPulse - Act_LiftPulseCount);
-            }
-            else
-            {
-                Emm5_MoveAbsolute(EMM5_LIFT_POS_TOP);
-            }
-        }
-        else
-        {
-            Emm5_MoveAbsolute(Act_LiftTargetPulse + Act_LiftPulseCount);
-        }
-    }
-    else if (lift_trim_pos == 1U && lift_trim_last_pos != 1U)
-    {
-        Emm5_Enable(0U);
-        Act_LiftMode = 0;
-        Act_LiftSpeed = 0;
-    }
-
-    lift_trim_last_pos = lift_trim_pos;
+    Emm5_Jog(lift_jog_cmd);
 }
 
 void Actuator_Task(void)
