@@ -8,40 +8,47 @@
 #define RC_RESTART_DEADZONE_US  120
 #define RC_SWITCH_LOW_US        1300U
 #define RC_SWITCH_HIGH_US       1700U
+#define LINEFOLLOW_MIN_SPEED_SCALE 350U
 
-#define SERVO_PULSE_MIN_US      500U
+#define SERVO_PULSE_MIN_US      550U
 #define SERVO_PULSE_MAX_US      2500U
+#define SERVO_FULL_OPEN_US      SERVO_PULSE_MIN_US
 #define SERVO_OPEN_US           1500U
-#define SERVO_TENNIS_US         1778U
-#define SERVO_GOLF_US           1747U
+#define SERVO_START_OPEN_US     SERVO_PULSE_MIN_US
+#define SERVO_TENNIS_US         2278U
+#define SERVO_GOLF_US           1944U
 
-#define VESC_MAX_ERPM           40000
+#define VESC_MAX_ERPM           25000
 #define VESC_SEND_PERIOD_US     10000U
+#define VESC_BRAKE_HOLD_DELAY_US       200000U
+#define VESC_BRAKE_HOLD_CURRENT_MA     1000
+#define VESC_BRAKE_HOLD_STEP_MA        100
 #define VESC_LEFT_SIGN          (-1)
 #define VESC_RIGHT_SIGN         (1)
-#define VESC_BRAKE_HOLD_CURRENT_MA  0
-#define VESC_BRAKE_HOLD_DELAY_US    100000U
 
 #define EMM5_DEFAULT_ADDR       3U
 #define EMM5_CHECK_BYTE         0x6BU
-#define EMM5_LIFT_AUTO_SPEED_RPM 500U
-#define EMM5_LIFT_TRIM_SPEED_RPM 120U
 #define EMM5_LIFT_ACCEL         50U
 #define EMM5_DIR_UP             0U
 #define EMM5_DIR_DOWN           1U
 #define EMM5_INIT_DELAY_MS      50U
-#define EMM5_LIFT_POS_LOW       0U
-#define EMM5_LIFT_POS_HIGH      5000U
-#define EMM5_LIFT_POS_MAX       7000U
-#define EMM5_LIFT_TRIM_STEP     80U
-#define EMM5_LIFT_TRIM_PERIOD_US 250000U
+#define EMM5_LIFT_TRIM_STEP     300U
+#define EMM5_LIFT_JOG_PERIOD_US 60000U
+#define EMM5_LIFT_JOG_RAMP_US   1500000U
+#define EMM5_LIFT_JOG_MIN_SPEED_RPM 80U
+#define EMM5_LIFT_JOG_MAX_SPEED_RPM 600U
+#define EMM5_LIFT_JOG_MIN_STEP  40U
+#define EMM5_LIFT_JOG_MAX_STEP  650U
+
+#define PLATFORM_MODE_FLAT      0U
+#define PLATFORM_MODE_CLIMB     2U
 
 volatile int16_t Act_LeftMotor = 0;
 volatile int16_t Act_RightMotor = 0;
 volatile int16_t Act_LiftSpeed = 0;
 volatile int16_t Act_MoveCmd = 0;
 volatile int16_t Act_TurnCmd = 0;
-volatile uint16_t Act_GripperPulse = SERVO_OPEN_US;
+volatile uint16_t Act_GripperPulse = SERVO_START_OPEN_US;
 volatile uint16_t Act_SpeedScale = 0;
 volatile uint8_t Act_GripperMode = 1;
 volatile int8_t Act_LiftMode = 0;
@@ -50,7 +57,9 @@ volatile uint32_t Act_LiftTriggerCount = 0;
 volatile uint8_t Act_VescEnable = 1;
 volatile uint8_t Act_DriveIdle = 0;
 volatile uint8_t Act_VescSendMode = 0;
-volatile uint32_t Act_LiftTargetPulse = EMM5_LIFT_POS_LOW;
+volatile uint32_t Act_LiftTargetPulse = 0U;
+volatile int16_t Act_LiftJogCmd = 0;
+volatile uint8_t Act_PlatformMode = PLATFORM_MODE_FLAT;
 volatile uint32_t Act_Emm5TxCount = 0;
 volatile uint32_t Act_Emm5TxOkCount = 0;
 volatile uint32_t Act_Emm5TxFailCount = 0;
@@ -61,18 +70,18 @@ volatile uint8_t Act_Emm5LastLen = 0;
 volatile uint8_t Act_Emm5LastTxStatus = 0xFFU;
 volatile uint8_t Act_Emm5LastCmd = 0U;
 volatile uint8_t Act_Emm5Enabled = 0U;
-volatile uint32_t Act_LiftAutoApplyCount = 0U;
-volatile int8_t Act_LiftTrimState = 0;
-volatile uint32_t Act_LiftStopCount = 0U;
+
+extern volatile uint8_t DEBUG_LineFollowState;
 
 static uint32_t vesc_last_tx_us = 0;
-static uint32_t drive_idle_start_us = 0;
-static uint8_t lift_switch_ready = 0;
-static uint8_t lift_last_pos = 1U;
-static uint8_t lift_trim_last_pos = 1U;
-static uint32_t lift_trim_last_us = 0U;
+static uint32_t lift_jog_last_us = 0;
+static uint32_t lift_jog_start_us = 0;
+static int8_t lift_jog_last_dir = 0;
+static uint32_t brake_hold_idle_start_us = 0;
+static int32_t brake_hold_current_mA = 0;
 static uint8_t drive_stop_latched = 1U;
 static uint8_t emm5_enabled = 0U;
+static uint8_t gripper_signal_seen = 0U;
 
 static int16_t RC_ToCenteredSigned(uint16_t pulse)
 {
@@ -173,16 +182,6 @@ static uint8_t RC_ToThreePosition(uint16_t pulse)
     }
 
     return 1U;
-}
-
-static uint8_t RC_ToTwoPosition(uint16_t pulse, uint8_t fallback)
-{
-    if (pulse < 800U || pulse > 2200U)
-    {
-        return fallback;
-    }
-
-    return (pulse >= 1500U) ? 1U : 0U;
 }
 
 static void Actuator_DelayMs(uint32_t ms)
@@ -351,17 +350,6 @@ static void Emm5_Enable(uint8_t enable)
     Act_Emm5Enabled = enable;
 }
 
-static void Emm5_ResetZero(void)
-{
-    uint8_t cmd[4];
-
-    cmd[0] = EMM5_DEFAULT_ADDR;
-    cmd[1] = 0x0AU;
-    cmd[2] = 0x6DU;
-    cmd[3] = EMM5_CHECK_BYTE;
-    Emm5_SendCmdExt(cmd, 4U);
-}
-
 static void Emm5_PosControl(uint8_t dir, uint32_t pulses, uint8_t absolute_pos, uint16_t speed_rpm)
 {
     uint8_t cmd[13];
@@ -382,19 +370,12 @@ static void Emm5_PosControl(uint8_t dir, uint32_t pulses, uint8_t absolute_pos, 
     Emm5_SendCmdExt(cmd, 13U);
 }
 
-static uint32_t Actuator_ClampLiftTarget(uint32_t target)
+static void Emm5_MoveRelative(uint8_t dir, uint32_t pulses, uint16_t speed_rpm)
 {
-    if (target > EMM5_LIFT_POS_MAX)
+    if (pulses == 0U)
     {
-        return EMM5_LIFT_POS_MAX;
+        return;
     }
-
-    return target;
-}
-
-static void Emm5_MoveAbsoluteWithSpeed(uint32_t target, uint16_t speed_rpm)
-{
-    uint8_t dir;
 
     if (emm5_enabled == 0U)
     {
@@ -402,61 +383,98 @@ static void Emm5_MoveAbsoluteWithSpeed(uint32_t target, uint16_t speed_rpm)
         Actuator_DelayMs(2U);
     }
 
-    target = Actuator_ClampLiftTarget(target);
-    if (target == Act_LiftTargetPulse)
-    {
-        return;
-    }
-
-    dir = (target >= Act_LiftTargetPulse) ? EMM5_DIR_UP : EMM5_DIR_DOWN;
-    Emm5_PosControl(dir, target, 1U, speed_rpm);
-    Act_LiftTargetPulse = target;
+    Emm5_PosControl(dir, pulses, 0U, speed_rpm);
     Act_LiftMode = (dir == EMM5_DIR_UP) ? 1 : -1;
-    Act_LiftSpeed = (dir == EMM5_DIR_UP) ? 1000 : -1000;
+    Act_LiftSpeed = (dir == EMM5_DIR_UP) ? (int16_t)speed_rpm : (int16_t)(-((int16_t)speed_rpm));
     Act_LiftTriggerCount++;
 }
 
-static void Emm5_MoveAbsolute(uint32_t target)
+static void Emm5_Jog(int16_t cmd)
 {
-    Emm5_MoveAbsoluteWithSpeed(target, EMM5_LIFT_AUTO_SPEED_RPM);
-}
+    uint32_t now_us;
+    uint32_t abs_cmd;
+    uint32_t ramp_us;
+    uint32_t intensity;
+    uint32_t step;
+    uint16_t speed_rpm;
+    int8_t jog_dir;
+    uint8_t emm5_dir;
 
-static void Emm5_Stop(void)
-{
-    if (emm5_enabled != 0U)
+    if (cmd == 0)
     {
-        Emm5_Enable(0U);
+        lift_jog_last_us = 0U;
+        lift_jog_start_us = 0U;
+        lift_jog_last_dir = 0;
+        if (emm5_enabled != 0U)
+        {
+            Emm5_Enable(0U);
+        }
+        Act_LiftMode = 0;
+        Act_LiftSpeed = 0;
+        return;
     }
 
-    Act_LiftMode = 0;
-    Act_LiftSpeed = 0;
-    Act_LiftTrimState = 0;
-    Act_LiftStopCount++;
-}
-
-static void Actuator_ApplyLiftSwitch(uint8_t lift_pos)
-{
-    lift_last_pos = lift_pos;
-    Act_LiftAutoApplyCount++;
-
-    if (lift_pos != 0U)
+    now_us = Remote_GetUs();
+    jog_dir = (cmd < 0) ? -1 : 1;
+    if (jog_dir != lift_jog_last_dir)
     {
-        Emm5_MoveAbsolute(EMM5_LIFT_POS_HIGH);
+        lift_jog_start_us = now_us;
+        lift_jog_last_us = 0U;
+        lift_jog_last_dir = jog_dir;
+    }
+
+    if (lift_jog_last_us != 0U &&
+        (uint32_t)(now_us - lift_jog_last_us) < EMM5_LIFT_JOG_PERIOD_US)
+    {
+        return;
+    }
+    lift_jog_last_us = now_us;
+
+    if (emm5_enabled == 0U)
+    {
+        Emm5_Enable(1U);
+        Actuator_DelayMs(2U);
+    }
+
+    abs_cmd = (cmd > 0) ? (uint32_t)cmd : (uint32_t)(-cmd);
+    ramp_us = (uint32_t)(now_us - lift_jog_start_us);
+    if (ramp_us > EMM5_LIFT_JOG_RAMP_US)
+    {
+        ramp_us = EMM5_LIFT_JOG_RAMP_US;
+    }
+
+    intensity = (abs_cmd * ramp_us) / EMM5_LIFT_JOG_RAMP_US;
+    if (intensity > 1000U)
+    {
+        intensity = 1000U;
+    }
+
+    step = EMM5_LIFT_JOG_MIN_STEP +
+           ((EMM5_LIFT_JOG_MAX_STEP - EMM5_LIFT_JOG_MIN_STEP) * intensity) / 1000U;
+    speed_rpm = (uint16_t)(EMM5_LIFT_JOG_MIN_SPEED_RPM +
+                ((EMM5_LIFT_JOG_MAX_SPEED_RPM - EMM5_LIFT_JOG_MIN_SPEED_RPM) * intensity) / 1000U);
+
+    if (jog_dir < 0)
+    {
+        emm5_dir = EMM5_DIR_UP;
     }
     else
     {
-        Emm5_MoveAbsolute(EMM5_LIFT_POS_LOW);
+        emm5_dir = EMM5_DIR_DOWN;
     }
+
+    Act_LiftTargetPulse = step;
+    Emm5_MoveRelative(emm5_dir, step, speed_rpm);
+    Act_LiftMode = (jog_dir < 0) ? -1 : 1;
+    Act_LiftSpeed = (jog_dir < 0) ? (int16_t)(-((int16_t)speed_rpm)) : (int16_t)speed_rpm;
 }
 
 static void Emm5_Init(void)
 {
     Actuator_DelayMs(EMM5_INIT_DELAY_MS);
-    Emm5_Enable(1U);
-    Actuator_DelayMs(EMM5_INIT_DELAY_MS);
-    Emm5_ResetZero();
-    Actuator_DelayMs(EMM5_INIT_DELAY_MS);
-    Act_LiftTargetPulse = EMM5_LIFT_POS_LOW;
+    emm5_enabled = 0U;
+    Act_Emm5Enabled = 0U;
+    Act_LiftTargetPulse = 0U;
     Act_LiftMode = 0;
     Act_LiftSpeed = 0;
 }
@@ -469,31 +487,20 @@ void Actuator_Init(void)
     LineFollow_Init();
 }
 
-void Actuator_OnUserStart(void)
-{
-    uint8_t lift_pos = RC_ToTwoPosition(RC_CH[5], lift_last_pos);
-
-    if (lift_switch_ready == 0U)
-    {
-        lift_switch_ready = 1U;
-    }
-
-    Actuator_ApplyLiftSwitch(lift_pos);
-}
-
 void Actuator_UpdateFromRC(void)
 {
-    uint32_t now_us = Remote_GetUs();
     int16_t move_cmd = RC_ToCenteredSigned(RC_CH[1]);
     int16_t turn_cmd = (int16_t)(-RC_ToCenteredSigned(RC_CH[0]));
     uint8_t move_near_center = RC_IsNearCenter(RC_CH[1], RC_STOP_DEADZONE_US);
     uint8_t turn_near_center = RC_IsNearCenter(RC_CH[0], RC_STOP_DEADZONE_US);
     uint8_t move_leave_center = RC_IsNearCenter(RC_CH[1], RC_RESTART_DEADZONE_US);
     uint8_t turn_leave_center = RC_IsNearCenter(RC_CH[0], RC_RESTART_DEADZONE_US);
+
     uint16_t speed_scale = RC_ToSpeedScale(RC_CH[2]);
-    uint8_t lift_trim_pos = RC_ToThreePosition(RC_CH[3]);
+    int16_t lift_jog_cmd = RC_ToCenteredSigned(RC_CH[3]);
     uint8_t gripper_pos = RC_ToThreePosition(RC_CH[4]);
-    uint8_t lift_pos = RC_ToTwoPosition(RC_CH[5], lift_last_pos);
+    uint8_t platform_mode = RC_ToThreePosition(RC_CH[5]);
+    uint16_t linefollow_speed_scale;
     int32_t scaled_move = ((int32_t)move_cmd * speed_scale) / 1000;
     int32_t scaled_turn = ((int32_t)turn_cmd * speed_scale) / 1000;
     int32_t left;
@@ -551,8 +558,15 @@ void Actuator_UpdateFromRC(void)
     Act_TurnCmd = turn_cmd;
     Act_SpeedScale = speed_scale;
     Act_GripperMode = gripper_pos;
+    Act_LiftJogCmd = lift_jog_cmd;
+    Act_PlatformMode = platform_mode;
 
-    LineFollow_Task(speed_scale);
+    linefollow_speed_scale = speed_scale;
+    if (LineFollow_IsEnabled() != 0U && linefollow_speed_scale < LINEFOLLOW_MIN_SPEED_SCALE)
+    {
+        linefollow_speed_scale = LINEFOLLOW_MIN_SPEED_SCALE;
+    }
+    LineFollow_Task(linefollow_speed_scale);
 
     if (LineFollow_IsEnabled() != 0U)
     {
@@ -565,93 +579,80 @@ void Actuator_UpdateFromRC(void)
         Act_RightMotor = (int16_t)((((int32_t)right * VESC_MAX_ERPM) / 1000) * VESC_RIGHT_SIGN);
     }
 
-    if (gripper_pos == 2U)
+    if (platform_mode == PLATFORM_MODE_CLIMB)
     {
-        Act_GripperPulse = SERVO_TENNIS_US;
-    }
-    else if (gripper_pos == 0U)
-    {
-        Act_GripperPulse = SERVO_GOLF_US;
+        Act_GripperPulse = SERVO_FULL_OPEN_US;
     }
     else
     {
-        Act_GripperPulse = SERVO_OPEN_US;
+        if (gripper_signal_seen == 0U)
+        {
+            if (RC_CH_Updated[4] != 0U)
+            {
+                gripper_signal_seen = 1U;
+            }
+            else
+            {
+                gripper_pos = 1U;
+                Act_GripperPulse = SERVO_START_OPEN_US;
+            }
+        }
+
+        if (gripper_signal_seen != 0U && gripper_pos == 2U)
+        {
+            Act_GripperPulse = SERVO_TENNIS_US;
+        }
+        else if (gripper_signal_seen != 0U && gripper_pos == 0U)
+        {
+            Act_GripperPulse = SERVO_GOLF_US;
+        }
+        else if (gripper_signal_seen != 0U)
+        {
+            Act_GripperPulse = SERVO_OPEN_US;
+        }
     }
 
     TIM3->CCR1 = RC_ToServoPulse(Act_GripperPulse);
 
-    if (lift_switch_ready == 0U)
-    {
-        lift_last_pos = lift_pos;
-        lift_trim_last_pos = lift_trim_pos;
-        lift_trim_last_us = now_us;
-        lift_switch_ready = 1U;
-    }
-    else if (lift_pos != lift_last_pos)
-    {
-        Actuator_ApplyLiftSwitch(lift_pos);
-    }
-
-    if (lift_trim_pos == 0U || lift_trim_pos == 2U)
-    {
-        if (lift_trim_pos != lift_trim_last_pos ||
-            (uint32_t)(now_us - lift_trim_last_us) >= EMM5_LIFT_TRIM_PERIOD_US)
-        {
-            if (lift_trim_pos == 0U)
-            {
-                Act_LiftTrimState = -1;
-                if (Act_LiftTargetPulse > Act_LiftPulseCount)
-                {
-                    Emm5_MoveAbsoluteWithSpeed(Act_LiftTargetPulse - Act_LiftPulseCount,
-                                               EMM5_LIFT_TRIM_SPEED_RPM);
-                }
-                else
-                {
-                    Emm5_MoveAbsoluteWithSpeed(0U, EMM5_LIFT_TRIM_SPEED_RPM);
-                }
-            }
-            else
-            {
-                Act_LiftTrimState = 1;
-                Emm5_MoveAbsoluteWithSpeed(Act_LiftTargetPulse + Act_LiftPulseCount,
-                                           EMM5_LIFT_TRIM_SPEED_RPM);
-            }
-
-            lift_trim_last_us = now_us;
-        }
-    }
-    else if (lift_trim_pos == 1U && lift_trim_last_pos != 1U)
-    {
-        Emm5_Stop();
-    }
-
-    lift_trim_last_pos = lift_trim_pos;
+    Emm5_Jog(lift_jog_cmd);
 }
 
 void Actuator_Task(void)
 {
     uint32_t now_us = Remote_GetUs();
-    uint8_t drive_idle;
+    uint8_t brake_hold_idle;
 
     if (Act_VescEnable != 0U && (uint32_t)(now_us - vesc_last_tx_us) >= VESC_SEND_PERIOD_US)
     {
         vesc_last_tx_us = now_us;
 
-        drive_idle = (Act_LeftMotor == 0 && Act_RightMotor == 0 && LineFollow_IsEnabled() == 0U) ? 1U : 0U;
-        Act_DriveIdle = drive_idle;
+        brake_hold_idle = (Act_LeftMotor == 0 &&
+                           Act_RightMotor == 0 &&
+                           LineFollow_IsEnabled() == 0U) ? 1U : 0U;
+        Act_DriveIdle = brake_hold_idle;
 
-        if (drive_idle != 0U)
+        if (brake_hold_idle != 0U)
         {
-            if (drive_idle_start_us == 0U)
+            if (brake_hold_idle_start_us == 0U)
             {
-                drive_idle_start_us = now_us;
+                brake_hold_idle_start_us = now_us;
+                brake_hold_current_mA = 0;
             }
 
-            if ((uint32_t)(now_us - drive_idle_start_us) >= VESC_BRAKE_HOLD_DELAY_US)
+            if ((uint32_t)(now_us - brake_hold_idle_start_us) >= VESC_BRAKE_HOLD_DELAY_US)
             {
                 Act_VescSendMode = 2U;
-                VescCan_SetBrakeCurrent(VESC_CAN_LEFT_ID, VESC_BRAKE_HOLD_CURRENT_MA);
-                VescCan_SetBrakeCurrent(VESC_CAN_RIGHT_ID, VESC_BRAKE_HOLD_CURRENT_MA);
+                if (brake_hold_current_mA < VESC_BRAKE_HOLD_CURRENT_MA)
+                {
+                    brake_hold_current_mA += VESC_BRAKE_HOLD_STEP_MA;
+                    if (brake_hold_current_mA > VESC_BRAKE_HOLD_CURRENT_MA)
+                    {
+                        brake_hold_current_mA = VESC_BRAKE_HOLD_CURRENT_MA;
+                    }
+                }
+
+                VescCan_SetBrakeCurrent(VESC_CAN_LEFT_ID, brake_hold_current_mA);
+                VescCan_SetBrakeCurrent(VESC_CAN_RIGHT_ID, brake_hold_current_mA);
             }
             else
             {
@@ -662,7 +663,8 @@ void Actuator_Task(void)
         }
         else
         {
-            drive_idle_start_us = 0U;
+            brake_hold_idle_start_us = 0U;
+            brake_hold_current_mA = 0;
             Act_VescSendMode = 1U;
             VescCan_SetRpm(VESC_CAN_LEFT_ID, Act_LeftMotor);
             VescCan_SetRpm(VESC_CAN_RIGHT_ID, Act_RightMotor);

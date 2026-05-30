@@ -3,7 +3,7 @@
 #include "actuator.h"
 #include "vesc_can.h"
 #include "line_follow.h"
-#include "imu_icm20948.h"
+#include "imu_test.h"
 #include <stdio.h>
 
 volatile uint32_t DEBUG_AliveCount = 0;
@@ -17,10 +17,14 @@ volatile uint8_t DEBUG_PLLRdy = 0;
 volatile uint8_t DEBUG_DWT_Alive = 0;
 volatile uint32_t DEBUG_DWT_TestDelta = 0;
 volatile uint8_t DEBUG_LineFollowState = 0;
-volatile uint32_t DEBUG_LineFollowEndUs = 0;
+volatile uint32_t DEBUG_LineFollowStateEndUs = 0;
 
+#define TURN_ERPM                    3000
 #define USER_KEY_DEBOUNCE_US        30000U
-#define LINEFOLLOW_RUN_TIME_US      15000000U
+#define DEBUG_PRINT_PERIOD_US       200000U
+#define LINEFOLLOW_FORWARD_TIME_US  15000000U
+#define LINEFOLLOW_TURN_TIME_US      1500000U
+#define LINEFOLLOW_REVERSE_TIME_US   1500000U
 
 #if defined(__CC_ARM)
 #pragma import(__use_no_semihosting)
@@ -114,8 +118,8 @@ int main(void)
 
     Debug_USART1_Init(115200);
     Remote_Init();
+    ImuTest_Init();
     Debug_CaptureBootState();
-    Imu_Init();
     Actuator_Init();
 
     while (1)
@@ -123,7 +127,6 @@ int main(void)
         DEBUG_AliveCount++;
         DEBUG_PA2_Level = (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_2) != Bit_RESET) ? 1 : 0;
         now_us = Remote_GetUs();
-        Imu_Task();
         {
             uint8_t user_key_raw = (GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_0) != Bit_RESET) ? 1U : 0U;
 
@@ -139,36 +142,69 @@ int main(void)
                 user_key_stable = user_key_raw;
                 if (user_key_stable == 0U && DEBUG_LineFollowState == 0U)
                 {
-                    Actuator_OnUserStart();
+                    LineFollow_Reverse = 0U;
                     LineFollow_SetEnabled(1U);
                     DEBUG_LineFollowState = 1U;
-                    DEBUG_LineFollowEndUs = now_us + LINEFOLLOW_RUN_TIME_US;
+                    DEBUG_LineFollowStateEndUs = now_us + LINEFOLLOW_FORWARD_TIME_US;
                 }
             }
         }
 
-        if (DEBUG_LineFollowState != 0U &&
-            (uint32_t)(now_us - DEBUG_LineFollowEndUs) < 0x80000000U)
+        if (DEBUG_LineFollowState == 1U &&
+            (uint32_t)(now_us - DEBUG_LineFollowStateEndUs) < 0x80000000U)
         {
             LineFollow_SetEnabled(0U);
+            LineFollow_Reverse = 0U;
+            DEBUG_LineFollowState = 2U;
+            DEBUG_LineFollowStateEndUs = now_us + LINEFOLLOW_TURN_TIME_US;
+        }
+
+        if (DEBUG_LineFollowState == 2U &&
+            (uint32_t)(now_us - DEBUG_LineFollowStateEndUs) < 0x80000000U)
+        {
+            LineFollow_Reverse = 1U;
+            LineFollow_SetEnabled(1U);
+            DEBUG_LineFollowState = 3U;
+            DEBUG_LineFollowStateEndUs = now_us + LINEFOLLOW_REVERSE_TIME_US;
+        }
+
+        if (DEBUG_LineFollowState == 3U &&
+            (uint32_t)(now_us - DEBUG_LineFollowStateEndUs) < 0x80000000U)
+        {
+            LineFollow_SetEnabled(0U);
+            LineFollow_Reverse = 0U;
             DEBUG_LineFollowState = 0U;
-            DEBUG_LineFollowEndUs = 0U;
+            DEBUG_LineFollowStateEndUs = 0U;
         }
 
         Actuator_UpdateFromRC();
+
+        if (DEBUG_LineFollowState == 2U)
+        {
+            Act_LeftMotor = (int16_t)(-TURN_ERPM);
+            Act_RightMotor = (int16_t)(-TURN_ERPM);
+        }
+
         Actuator_Task();
         VescCan_DebugPoll();
+        ImuTest_Task(now_us);
 
-        if ((uint32_t)(now_us - last_print_us) >= 100000U)
+        if ((uint32_t)(now_us - last_print_us) >= DEBUG_PRINT_PERIOD_US)
         {
             last_print_us = now_us;
-            printf("SYS:%u HSE:%u PLL:%u DWT:%u DLT:%u CORE:%u\r\n",
+            printf("ST:%u SYS:%u HSE:%u CORE:%u IMU:id=0x%02X on=%u ok=%lu fail=%lu ax=%d ay=%d az=%d p10=%d\r\n",
+                   DEBUG_LineFollowState,
                    DEBUG_SysclkSource,
                    DEBUG_HSERdy,
-                   DEBUG_PLLRdy,
-                   DEBUG_DWT_Alive,
-                   DEBUG_DWT_TestDelta,
-                   DEBUG_BootSystemCoreClock);
+                   DEBUG_BootSystemCoreClock,
+                   ImuTest_DeviceId,
+                   ImuTest_Online,
+                   (unsigned long)ImuTest_ReadOk,
+                   (unsigned long)ImuTest_ReadFail,
+                   ImuTest_AccelX,
+                   ImuTest_AccelY,
+                   ImuTest_AccelZ,
+                   ImuTest_PitchX10);
         }
     }
 }

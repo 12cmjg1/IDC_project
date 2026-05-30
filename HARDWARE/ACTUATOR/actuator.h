@@ -4,7 +4,6 @@
 #include "stm32f4xx.h"
 
 void Actuator_Init(void);
-void Actuator_OnUserStart(void);
 void Actuator_UpdateFromRC(void);
 void Actuator_Task(void);
 
@@ -23,6 +22,8 @@ extern volatile uint32_t Act_LiftTriggerCount;
 extern volatile uint8_t Act_VescEnable;
 extern volatile uint8_t Act_DriveIdle;
 extern volatile uint8_t Act_VescSendMode;
+extern volatile int16_t Act_LiftJogCmd;
+extern volatile uint8_t Act_PlatformMode;
 extern volatile uint32_t Act_Emm5TxCount;
 extern volatile uint32_t Act_Emm5TxOkCount;
 extern volatile uint32_t Act_Emm5TxFailCount;
@@ -33,8 +34,5 @@ extern volatile uint8_t Act_Emm5LastLen;
 extern volatile uint8_t Act_Emm5LastTxStatus;
 extern volatile uint8_t Act_Emm5LastCmd;
 extern volatile uint8_t Act_Emm5Enabled;
-extern volatile uint32_t Act_LiftAutoApplyCount;
-extern volatile int8_t Act_LiftTrimState;
-extern volatile uint32_t Act_LiftStopCount;
 
 #endif

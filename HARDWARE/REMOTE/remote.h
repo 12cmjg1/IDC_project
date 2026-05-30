@@ -24,6 +24,7 @@ void Remote_Init(void);
 void Remote_CH1_Init(void);
 void Remote_TIM10_IRQHandler(void);
 void Remote_EXTI0_IRQHandler(void);
+void Remote_EXTI1_IRQHandler(void);
 void Remote_EXTI2_IRQHandler(void);
 void Remote_EXTI3_IRQHandler(void);
 void Remote_EXTI9_5_IRQHandler(void);
