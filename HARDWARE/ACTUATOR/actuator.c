@@ -13,10 +13,10 @@
 #define SERVO_PULSE_MIN_US      550U
 #define SERVO_PULSE_MAX_US      2500U
 #define SERVO_FULL_OPEN_US      SERVO_PULSE_MIN_US
-#define SERVO_OPEN_US           1500U
+#define SERVO_OPEN_US           1750U
 #define SERVO_START_OPEN_US     SERVO_PULSE_MIN_US
-#define SERVO_TENNIS_US         2278U
-#define SERVO_GOLF_US           1944U
+#define SERVO_TENNIS_US         1450U
+#define SERVO_GOLF_US           1500U
 
 #define VESC_MAX_ERPM           25000
 #define VESC_SEND_PERIOD_US     10000U
@@ -28,17 +28,14 @@
 
 #define EMM5_DEFAULT_ADDR       3U
 #define EMM5_CHECK_BYTE         0x6BU
-#define EMM5_LIFT_ACCEL         50U
+#define EMM5_LIFT_ACCEL         0U
 #define EMM5_DIR_UP             0U
 #define EMM5_DIR_DOWN           1U
 #define EMM5_INIT_DELAY_MS      50U
 #define EMM5_LIFT_TRIM_STEP     300U
-#define EMM5_LIFT_JOG_PERIOD_US 60000U
-#define EMM5_LIFT_JOG_RAMP_US   1500000U
-#define EMM5_LIFT_JOG_MIN_SPEED_RPM 80U
-#define EMM5_LIFT_JOG_MAX_SPEED_RPM 600U
-#define EMM5_LIFT_JOG_MIN_STEP  40U
-#define EMM5_LIFT_JOG_MAX_STEP  650U
+#define EMM5_LIFT_JOG_PERIOD_US 80000U
+#define EMM5_LIFT_JOG_MIN_SPEED_RPM 70U
+#define EMM5_LIFT_JOG_MAX_SPEED_RPM 364U
 
 #define PLATFORM_MODE_FLAT      0U
 #define PLATFORM_MODE_CLIMB     2U
@@ -75,8 +72,8 @@ extern volatile uint8_t DEBUG_LineFollowState;
 
 static uint32_t vesc_last_tx_us = 0;
 static uint32_t lift_jog_last_us = 0;
-static uint32_t lift_jog_start_us = 0;
 static int8_t lift_jog_last_dir = 0;
+static uint16_t lift_jog_last_speed_rpm = 0U;
 static uint32_t brake_hold_idle_start_us = 0;
 static int32_t brake_hold_current_mA = 0;
 static uint8_t drive_stop_latched = 1U;
@@ -350,32 +347,9 @@ static void Emm5_Enable(uint8_t enable)
     Act_Emm5Enabled = enable;
 }
 
-static void Emm5_PosControl(uint8_t dir, uint32_t pulses, uint8_t absolute_pos, uint16_t speed_rpm)
+static void Emm5_SpeedControl(uint8_t dir, uint16_t speed_rpm)
 {
-    uint8_t cmd[13];
-
-    cmd[0] = EMM5_DEFAULT_ADDR;
-    cmd[1] = 0xFDU;
-    cmd[2] = dir;
-    cmd[3] = (uint8_t)(speed_rpm >> 8);
-    cmd[4] = (uint8_t)(speed_rpm >> 0);
-    cmd[5] = (uint8_t)EMM5_LIFT_ACCEL;
-    cmd[6] = (uint8_t)(pulses >> 24);
-    cmd[7] = (uint8_t)(pulses >> 16);
-    cmd[8] = (uint8_t)(pulses >> 8);
-    cmd[9] = (uint8_t)(pulses >> 0);
-    cmd[10] = absolute_pos;
-    cmd[11] = 0U;
-    cmd[12] = EMM5_CHECK_BYTE;
-    Emm5_SendCmdExt(cmd, 13U);
-}
-
-static void Emm5_MoveRelative(uint8_t dir, uint32_t pulses, uint16_t speed_rpm)
-{
-    if (pulses == 0U)
-    {
-        return;
-    }
+    uint8_t cmd[8];
 
     if (emm5_enabled == 0U)
     {
@@ -383,28 +357,51 @@ static void Emm5_MoveRelative(uint8_t dir, uint32_t pulses, uint16_t speed_rpm)
         Actuator_DelayMs(2U);
     }
 
-    Emm5_PosControl(dir, pulses, 0U, speed_rpm);
+    cmd[0] = EMM5_DEFAULT_ADDR;
+    cmd[1] = 0xF6U;
+    cmd[2] = dir;
+    cmd[3] = (uint8_t)(speed_rpm >> 8);
+    cmd[4] = (uint8_t)(speed_rpm >> 0);
+    cmd[5] = (uint8_t)EMM5_LIFT_ACCEL;
+    cmd[6] = 0U;
+    cmd[7] = EMM5_CHECK_BYTE;
+    Emm5_SendCmdExt(cmd, 8U);
+
     Act_LiftMode = (dir == EMM5_DIR_UP) ? 1 : -1;
     Act_LiftSpeed = (dir == EMM5_DIR_UP) ? (int16_t)speed_rpm : (int16_t)(-((int16_t)speed_rpm));
     Act_LiftTriggerCount++;
+}
+
+static void Emm5_StopImmediate(void)
+{
+    uint8_t cmd[5];
+
+    cmd[0] = EMM5_DEFAULT_ADDR;
+    cmd[1] = 0xFEU;
+    cmd[2] = 0x98U;
+    cmd[3] = 0U;
+    cmd[4] = EMM5_CHECK_BYTE;
+    Emm5_SendCmdExt(cmd, 5U);
 }
 
 static void Emm5_Jog(int16_t cmd)
 {
     uint32_t now_us;
     uint32_t abs_cmd;
-    uint32_t ramp_us;
     uint32_t intensity;
-    uint32_t step;
     uint16_t speed_rpm;
     int8_t jog_dir;
     uint8_t emm5_dir;
 
     if (cmd == 0)
     {
-        lift_jog_last_us = 0U;
-        lift_jog_start_us = 0U;
+        if (lift_jog_last_dir != 0)
+        {
+            Emm5_StopImmediate();
+        }
         lift_jog_last_dir = 0;
+        lift_jog_last_speed_rpm = 0U;
+        lift_jog_last_us = 0U;
         if (emm5_enabled != 0U)
         {
             Emm5_Enable(0U);
@@ -416,41 +413,13 @@ static void Emm5_Jog(int16_t cmd)
 
     now_us = Remote_GetUs();
     jog_dir = (cmd < 0) ? -1 : 1;
-    if (jog_dir != lift_jog_last_dir)
-    {
-        lift_jog_start_us = now_us;
-        lift_jog_last_us = 0U;
-        lift_jog_last_dir = jog_dir;
-    }
-
-    if (lift_jog_last_us != 0U &&
-        (uint32_t)(now_us - lift_jog_last_us) < EMM5_LIFT_JOG_PERIOD_US)
-    {
-        return;
-    }
-    lift_jog_last_us = now_us;
-
-    if (emm5_enabled == 0U)
-    {
-        Emm5_Enable(1U);
-        Actuator_DelayMs(2U);
-    }
-
     abs_cmd = (cmd > 0) ? (uint32_t)cmd : (uint32_t)(-cmd);
-    ramp_us = (uint32_t)(now_us - lift_jog_start_us);
-    if (ramp_us > EMM5_LIFT_JOG_RAMP_US)
-    {
-        ramp_us = EMM5_LIFT_JOG_RAMP_US;
-    }
-
-    intensity = (abs_cmd * ramp_us) / EMM5_LIFT_JOG_RAMP_US;
+    intensity = abs_cmd;
     if (intensity > 1000U)
     {
         intensity = 1000U;
     }
 
-    step = EMM5_LIFT_JOG_MIN_STEP +
-           ((EMM5_LIFT_JOG_MAX_STEP - EMM5_LIFT_JOG_MIN_STEP) * intensity) / 1000U;
     speed_rpm = (uint16_t)(EMM5_LIFT_JOG_MIN_SPEED_RPM +
                 ((EMM5_LIFT_JOG_MAX_SPEED_RPM - EMM5_LIFT_JOG_MIN_SPEED_RPM) * intensity) / 1000U);
 
@@ -463,8 +432,20 @@ static void Emm5_Jog(int16_t cmd)
         emm5_dir = EMM5_DIR_DOWN;
     }
 
-    Act_LiftTargetPulse = step;
-    Emm5_MoveRelative(emm5_dir, step, speed_rpm);
+    if (jog_dir == lift_jog_last_dir &&
+        speed_rpm == lift_jog_last_speed_rpm &&
+        lift_jog_last_us != 0U &&
+        (uint32_t)(now_us - lift_jog_last_us) < EMM5_LIFT_JOG_PERIOD_US)
+    {
+        return;
+    }
+
+    lift_jog_last_dir = jog_dir;
+    lift_jog_last_speed_rpm = speed_rpm;
+    lift_jog_last_us = now_us;
+
+    Act_LiftTargetPulse = 0U;
+    Emm5_SpeedControl(emm5_dir, speed_rpm);
     Act_LiftMode = (jog_dir < 0) ? -1 : 1;
     Act_LiftSpeed = (jog_dir < 0) ? (int16_t)(-((int16_t)speed_rpm)) : (int16_t)speed_rpm;
 }

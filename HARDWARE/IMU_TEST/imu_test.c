@@ -10,12 +10,15 @@
 #define IMU_TEST_ADDR            0xD0U
 #define IMU_TEST_WHO_AM_I        0x00U
 #define IMU_TEST_REG_BANK_SEL    0x7FU
+#define IMU_TEST_USER_CTRL       0x03U
 #define IMU_TEST_PWR_MGMT_1      0x06U
+#define IMU_TEST_INT_PIN_CFG     0x0FU
 #define IMU_TEST_ACCEL_XOUT_H    0x2DU
 #define IMU_TEST_GYRO_CONFIG_1   0x01U
 #define IMU_TEST_GYRO_SMPLRT_DIV 0x00U
 #define IMU_TEST_ACCEL_CONFIG    0x14U
 #define IMU_TEST_ACCEL_DIV_2     0x11U
+#define IMU_TEST_WHO_AM_I_VALUE  0xEAU
 
 #define IMU_TEST_BANK_0          0x00U
 #define IMU_TEST_BANK_2          0x20U
@@ -40,7 +43,7 @@ static void ImuTest_Delay(void)
 {
     volatile uint16_t i;
 
-    for (i = 0; i < 80U; i++)
+    for (i = 0; i < 25U; i++)
     {
     }
 }
@@ -83,7 +86,7 @@ static void ImuTest_SdaOut(void)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(IMU_TEST_I2C_PORT, &GPIO_InitStructure);
 }
 
@@ -95,7 +98,7 @@ static void ImuTest_SdaIn(void)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(IMU_TEST_I2C_PORT, &GPIO_InitStructure);
 }
 
@@ -350,23 +353,40 @@ void ImuTest_Init(void)
 {
     uint8_t id;
     uint8_t ok;
+    uint8_t retry;
 
     ImuTest_I2cInit();
     ImuTest_Online = 0U;
     ImuTest_DeviceId = 0U;
 
-    ok = ImuTest_SelectBank(IMU_TEST_BANK_0);
+    ok = 0U;
+    id = 0U;
+    for (retry = 0U; retry < 3U; retry++)
+    {
+        ok = ImuTest_SelectBank(IMU_TEST_BANK_0);
+        ok &= ImuTest_ReadReg(IMU_TEST_WHO_AM_I, &id, 1U);
+        ImuTest_DeviceId = id;
+        if (ok != 0U && id == IMU_TEST_WHO_AM_I_VALUE)
+        {
+            break;
+        }
+
+        ImuTest_WriteReg(IMU_TEST_PWR_MGMT_1, 0x80U);
+        ImuTest_WaitUs(100000U);
+    }
+
+    ok &= ImuTest_WriteReg(IMU_TEST_PWR_MGMT_1, 0x80U);
+    ImuTest_WaitUs(100000U);
+    ok &= ImuTest_SelectBank(IMU_TEST_BANK_0);
     ok &= ImuTest_ReadReg(IMU_TEST_WHO_AM_I, &id, 1U);
     ImuTest_DeviceId = id;
-
-    if (ok == 0U || id != 0xEAU)
+    if (ok == 0U || id != IMU_TEST_WHO_AM_I_VALUE)
     {
         ImuTest_ReadFail++;
         return;
     }
 
-    ok &= ImuTest_WriteReg(IMU_TEST_PWR_MGMT_1, 0x80U);
-    ImuTest_WaitUs(100000U);
+    ok &= ImuTest_WriteReg(IMU_TEST_USER_CTRL, 0x00U);
     ok &= ImuTest_WriteReg(IMU_TEST_PWR_MGMT_1, 0x01U);
     ImuTest_WaitUs(10000U);
     ok &= ImuTest_SelectBank(IMU_TEST_BANK_2);
@@ -375,6 +395,7 @@ void ImuTest_Init(void)
     ok &= ImuTest_WriteReg(IMU_TEST_ACCEL_DIV_2, 0x04U);
     ok &= ImuTest_WriteReg(IMU_TEST_ACCEL_CONFIG, 0x29U);
     ok &= ImuTest_SelectBank(IMU_TEST_BANK_0);
+    ok &= ImuTest_WriteReg(IMU_TEST_INT_PIN_CFG, 0x02U);
 
     if (ok == 0U)
     {

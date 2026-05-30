@@ -18,13 +18,26 @@ volatile uint8_t DEBUG_DWT_Alive = 0;
 volatile uint32_t DEBUG_DWT_TestDelta = 0;
 volatile uint8_t DEBUG_LineFollowState = 0;
 volatile uint32_t DEBUG_LineFollowStateEndUs = 0;
+volatile uint8_t DEBUG_AutoClimbState = 0;
+volatile uint8_t DEBUG_AutoClimbSawSlope = 0;
+volatile int16_t DEBUG_AutoClimbStartPitchX10 = 0;
+volatile int16_t DEBUG_AutoClimbPitchDeltaX10 = 0;
+volatile uint32_t DEBUG_AutoClimbStartUs = 0;
 
-#define TURN_ERPM                    3000
 #define USER_KEY_DEBOUNCE_US        30000U
 #define DEBUG_PRINT_PERIOD_US       200000U
-#define LINEFOLLOW_FORWARD_TIME_US  15000000U
-#define LINEFOLLOW_TURN_TIME_US      1500000U
-#define LINEFOLLOW_REVERSE_TIME_US   1500000U
+#define AUTO_CLIMB_LEFT_ERPM        (-9000)
+#define AUTO_CLIMB_RIGHT_ERPM        9000
+#define AUTO_CLIMB_IMU_EXIT_MIN_TIME_US 1800000U
+#define AUTO_CLIMB_MAX_TIME_US      4000000U
+#define AUTO_CLIMB_SETTLE_TIME_US    300000U
+#define AUTO_CLIMB_SLOPE_ENTER_X10       80
+#define AUTO_CLIMB_SLOPE_EXIT_X10        45
+
+#define AUTO_CLIMB_IDLE             0U
+#define AUTO_CLIMB_DRIVE            1U
+#define AUTO_CLIMB_SETTLE           2U
+#define AUTO_CLIMB_DONE             3U
 
 #if defined(__CC_ARM)
 #pragma import(__use_no_semihosting)
@@ -106,6 +119,11 @@ static void Debug_CaptureBootState(void)
     DEBUG_DWT_Alive = (DEBUG_DWT_TestDelta != 0U) ? 1U : 0U;
 }
 
+static int16_t AbsInt16(int16_t value)
+{
+    return (value < 0) ? (int16_t)(-value) : value;
+}
+
 int main(void)
 {
     uint32_t last_print_us = 0;
@@ -140,49 +158,66 @@ int main(void)
                 (uint32_t)(now_us - user_key_change_us) >= USER_KEY_DEBOUNCE_US)
             {
                 user_key_stable = user_key_raw;
-                if (user_key_stable == 0U && DEBUG_LineFollowState == 0U)
+                if (user_key_stable == 0U &&
+                    (DEBUG_AutoClimbState == AUTO_CLIMB_IDLE ||
+                     DEBUG_AutoClimbState == AUTO_CLIMB_DONE))
                 {
+                    LineFollow_SetEnabled(0U);
                     LineFollow_Reverse = 0U;
-                    LineFollow_SetEnabled(1U);
-                    DEBUG_LineFollowState = 1U;
-                    DEBUG_LineFollowStateEndUs = now_us + LINEFOLLOW_FORWARD_TIME_US;
+                    DEBUG_LineFollowState = 0U;
+                    DEBUG_LineFollowStateEndUs = 0U;
+                    DEBUG_AutoClimbState = AUTO_CLIMB_DRIVE;
+                    DEBUG_AutoClimbSawSlope = 0U;
+                    DEBUG_AutoClimbStartPitchX10 = ImuTest_PitchX10;
+                    DEBUG_AutoClimbPitchDeltaX10 = 0;
+                    DEBUG_AutoClimbStartUs = now_us;
                 }
             }
         }
 
-        if (DEBUG_LineFollowState == 1U &&
-            (uint32_t)(now_us - DEBUG_LineFollowStateEndUs) < 0x80000000U)
-        {
-            LineFollow_SetEnabled(0U);
-            LineFollow_Reverse = 0U;
-            DEBUG_LineFollowState = 2U;
-            DEBUG_LineFollowStateEndUs = now_us + LINEFOLLOW_TURN_TIME_US;
-        }
-
-        if (DEBUG_LineFollowState == 2U &&
-            (uint32_t)(now_us - DEBUG_LineFollowStateEndUs) < 0x80000000U)
-        {
-            LineFollow_Reverse = 1U;
-            LineFollow_SetEnabled(1U);
-            DEBUG_LineFollowState = 3U;
-            DEBUG_LineFollowStateEndUs = now_us + LINEFOLLOW_REVERSE_TIME_US;
-        }
-
-        if (DEBUG_LineFollowState == 3U &&
-            (uint32_t)(now_us - DEBUG_LineFollowStateEndUs) < 0x80000000U)
-        {
-            LineFollow_SetEnabled(0U);
-            LineFollow_Reverse = 0U;
-            DEBUG_LineFollowState = 0U;
-            DEBUG_LineFollowStateEndUs = 0U;
-        }
-
         Actuator_UpdateFromRC();
 
-        if (DEBUG_LineFollowState == 2U)
+        if (DEBUG_AutoClimbState == AUTO_CLIMB_DRIVE)
         {
-            Act_LeftMotor = (int16_t)(-TURN_ERPM);
-            Act_RightMotor = (int16_t)(-TURN_ERPM);
+            int16_t pitch_delta_x10;
+            int16_t abs_pitch_delta_x10;
+            uint32_t elapsed_us;
+
+            LineFollow_SetEnabled(0U);
+            pitch_delta_x10 = (int16_t)(ImuTest_PitchX10 - DEBUG_AutoClimbStartPitchX10);
+            abs_pitch_delta_x10 = AbsInt16(pitch_delta_x10);
+            elapsed_us = (uint32_t)(now_us - DEBUG_AutoClimbStartUs);
+
+            DEBUG_AutoClimbPitchDeltaX10 = pitch_delta_x10;
+            if (ImuTest_Online != 0U &&
+                abs_pitch_delta_x10 >= AUTO_CLIMB_SLOPE_ENTER_X10)
+            {
+                DEBUG_AutoClimbSawSlope = 1U;
+            }
+
+            Act_LeftMotor = AUTO_CLIMB_LEFT_ERPM;
+            Act_RightMotor = AUTO_CLIMB_RIGHT_ERPM;
+
+            if ((elapsed_us >= AUTO_CLIMB_MAX_TIME_US) ||
+                (elapsed_us >= AUTO_CLIMB_IMU_EXIT_MIN_TIME_US &&
+                 DEBUG_AutoClimbSawSlope != 0U &&
+                 abs_pitch_delta_x10 <= AUTO_CLIMB_SLOPE_EXIT_X10))
+            {
+                Act_LeftMotor = 0;
+                Act_RightMotor = 0;
+                DEBUG_AutoClimbState = AUTO_CLIMB_SETTLE;
+                DEBUG_AutoClimbStartUs = now_us;
+            }
+        }
+        else if (DEBUG_AutoClimbState == AUTO_CLIMB_SETTLE)
+        {
+            Act_LeftMotor = 0;
+            Act_RightMotor = 0;
+
+            if ((uint32_t)(now_us - DEBUG_AutoClimbStartUs) >= AUTO_CLIMB_SETTLE_TIME_US)
+            {
+                DEBUG_AutoClimbState = AUTO_CLIMB_DONE;
+            }
         }
 
         Actuator_Task();
@@ -192,8 +227,10 @@ int main(void)
         if ((uint32_t)(now_us - last_print_us) >= DEBUG_PRINT_PERIOD_US)
         {
             last_print_us = now_us;
-            printf("ST:%u SYS:%u HSE:%u CORE:%u IMU:id=0x%02X on=%u ok=%lu fail=%lu ax=%d ay=%d az=%d p10=%d\r\n",
-                   DEBUG_LineFollowState,
+            printf("AST:%u SLP:%u DP:%d SYS:%u HSE:%u CORE:%u IMU:id=0x%02X on=%u ok=%lu fail=%lu ax=%d ay=%d az=%d p10=%d\r\n",
+                   DEBUG_AutoClimbState,
+                   DEBUG_AutoClimbSawSlope,
+                   DEBUG_AutoClimbPitchDeltaX10,
                    DEBUG_SysclkSource,
                    DEBUG_HSERdy,
                    DEBUG_BootSystemCoreClock,
