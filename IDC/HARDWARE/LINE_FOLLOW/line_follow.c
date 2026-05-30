@@ -12,12 +12,14 @@
 #define LINEFOLLOW_CAPTURE_PERIOD_US     10000U
 #define LINEFOLLOW_CROSS_THRESHOLD       30U
 #define LINEFOLLOW_LOST_WIDTH_THRESHOLD  4U
-#define LINEFOLLOW_BASE_ERPM_MAX         9000
-#define LINEFOLLOW_STEER_MAX_ERPM        3500
-#define LINEFOLLOW_LOST_STEER_ERPM       2500
-#define LINEFOLLOW_OUTPUT_ERPM_MAX       12000
-#define LINEFOLLOW_FORWARD_SIGN          (1)
-#define LINEFOLLOW_KP_NUM                3
+#define LINEFOLLOW_MAX_WIDTH_THRESHOLD   32U
+#define LINEFOLLOW_MIN_CONTRAST          25U
+#define LINEFOLLOW_BLACK_THRESHOLD_NUM   40U
+#define LINEFOLLOW_BLACK_THRESHOLD_DEN   100U
+#define LINEFOLLOW_BASE_ERPM_MAX         7000
+#define LINEFOLLOW_STEER_MAX_ERPM        2500
+#define LINEFOLLOW_LOST_STEER_ERPM       1800
+#define LINEFOLLOW_KP_NUM                2
 #define LINEFOLLOW_KP_DEN                1
 #define LINEFOLLOW_KD_NUM                0
 #define LINEFOLLOW_KD_DEN                1
@@ -152,6 +154,7 @@ static void LineFollow_ProcessFrame(void)
     uint16_t left = CCD_VALID_LEFT;
     uint16_t right = CCD_VALID_RIGHT;
     uint16_t i;
+    uint16_t contrast;
     uint8_t left_found = 0U;
     uint8_t right_found = 0U;
     int16_t position;
@@ -168,7 +171,18 @@ static void LineFollow_ProcessFrame(void)
         }
     }
 
-    LineFollow_Threshold = (uint16_t)((max_v + min_v) / 2U);
+    contrast = (uint16_t)(max_v - min_v);
+    if (contrast < LINEFOLLOW_MIN_CONTRAST)
+    {
+        LineFollow_Lost = 1U;
+        LineFollow_Cross = 0U;
+        LineFollow_Width = 0U;
+        LineFollow_Center = CCD_CENTER_PIXEL;
+        LineFollow_Position = (last_position >= 0) ? 1000 : -1000;
+        return;
+    }
+
+    LineFollow_Threshold = (uint16_t)(min_v + ((uint32_t)contrast * LINEFOLLOW_BLACK_THRESHOLD_NUM) / LINEFOLLOW_BLACK_THRESHOLD_DEN);
 
     for (i = CCD_VALID_LEFT; i < (CCD_VALID_RIGHT - 5U); i++)
     {
@@ -212,6 +226,16 @@ static void LineFollow_ProcessFrame(void)
 
     LineFollow_Width = (uint16_t)(right - left);
     LineFollow_Center = (uint16_t)((right + left) / 2U);
+
+    if (LineFollow_Width < LINEFOLLOW_LOST_WIDTH_THRESHOLD ||
+        LineFollow_Width > LINEFOLLOW_MAX_WIDTH_THRESHOLD)
+    {
+        LineFollow_Lost = 1U;
+        LineFollow_Cross = 0U;
+        LineFollow_Position = (last_position >= 0) ? 1000 : -1000;
+        return;
+    }
+
     position = (int16_t)(((int32_t)LineFollow_Center - CCD_CENTER_PIXEL) * 1000 / CCD_CENTER_PIXEL);
 
     if (position > 1000)
@@ -224,7 +248,7 @@ static void LineFollow_ProcessFrame(void)
     }
 
     LineFollow_Position = position;
-    LineFollow_Lost = (LineFollow_Width < LINEFOLLOW_LOST_WIDTH_THRESHOLD) ? 1U : 0U;
+    LineFollow_Lost = 0U;
     LineFollow_Cross = (LineFollow_Width > LINEFOLLOW_CROSS_THRESHOLD) ? 1U : 0U;
 }
 
@@ -295,7 +319,7 @@ void LineFollow_Task(uint16_t speed_scale)
         return;
     }
 
-    base_erpm = (((int32_t)speed_scale * LINEFOLLOW_BASE_ERPM_MAX) / 1000) * LINEFOLLOW_FORWARD_SIGN;
+    base_erpm = -(((int32_t)speed_scale * LINEFOLLOW_BASE_ERPM_MAX) / 1000);
 
     if (LineFollow_Reverse != 0U)
     {
@@ -309,7 +333,7 @@ void LineFollow_Task(uint16_t speed_scale)
     else
     {
         diff = (int32_t)LineFollow_Position - (int32_t)last_position;
-        steer_erpm = -((int32_t)LineFollow_Position * LINEFOLLOW_KP_NUM) / LINEFOLLOW_KP_DEN;
+        steer_erpm = ((int32_t)LineFollow_Position * LINEFOLLOW_KP_NUM) / LINEFOLLOW_KP_DEN;
         steer_erpm += (diff * LINEFOLLOW_KD_NUM) / LINEFOLLOW_KD_DEN;
     }
 
@@ -333,22 +357,22 @@ void LineFollow_Task(uint16_t speed_scale)
         right = base_erpm - steer_erpm;
     }
 
-    if (left > LINEFOLLOW_OUTPUT_ERPM_MAX)
+    if (left > 12000)
     {
-        left = LINEFOLLOW_OUTPUT_ERPM_MAX;
+        left = 12000;
     }
-    else if (left < -LINEFOLLOW_OUTPUT_ERPM_MAX)
+    else if (left < -12000)
     {
-        left = -LINEFOLLOW_OUTPUT_ERPM_MAX;
+        left = -12000;
     }
 
-    if (right > LINEFOLLOW_OUTPUT_ERPM_MAX)
+    if (right > 12000)
     {
-        right = LINEFOLLOW_OUTPUT_ERPM_MAX;
+        right = 12000;
     }
-    else if (right < -LINEFOLLOW_OUTPUT_ERPM_MAX)
+    else if (right < -12000)
     {
-        right = -LINEFOLLOW_OUTPUT_ERPM_MAX;
+        right = -12000;
     }
 
     LineFollow_LeftCmdErpm = (int16_t)left;

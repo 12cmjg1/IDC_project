@@ -3,6 +3,7 @@
 #include "actuator.h"
 #include "vesc_can.h"
 #include "line_follow.h"
+#include "imu_test.h"
 #include <stdio.h>
 
 volatile uint32_t DEBUG_AliveCount = 0;
@@ -25,6 +26,7 @@ volatile uint32_t DEBUG_LineFollowStateEndUs = 0;
 
 /* 各阶段时长 */
 #define USER_KEY_DEBOUNCE_US        30000U
+#define DEBUG_PRINT_PERIOD_US       200000U
 #define LINEFOLLOW_FORWARD_TIME_US  15000000U   /* 正向巡线 15s */
 #define LINEFOLLOW_TURN_TIME_US     1500000U    /* 原地转180 约1.5s (需实测调整) */
 #define LINEFOLLOW_REVERSE_TIME_US  1500000U    /* 反向巡线 1.5s */
@@ -121,6 +123,7 @@ int main(void)
 
     Debug_USART1_Init(115200);
     Remote_Init();
+    ImuTest_Init();
     Debug_CaptureBootState();
     Actuator_Init();
 
@@ -202,15 +205,24 @@ int main(void)
 
         Actuator_Task();
         VescCan_DebugPoll();
+        ImuTest_Task(now_us);
 
-        if ((uint32_t)(now_us - last_print_us) >= 100000U)
+        if ((uint32_t)(now_us - last_print_us) >= DEBUG_PRINT_PERIOD_US)
         {
             last_print_us = now_us;
-            printf("ST:%u SYS:%u HSE:%u CORE:%u\r\n",
+            printf("ST:%u SYS:%u HSE:%u CORE:%u IMU:id=0x%02X on=%u ok=%lu fail=%lu ax=%d ay=%d az=%d p10=%d\r\n",
                    DEBUG_LineFollowState,
                    DEBUG_SysclkSource,
                    DEBUG_HSERdy,
-                   DEBUG_BootSystemCoreClock);
+                   DEBUG_BootSystemCoreClock,
+                   ImuTest_DeviceId,
+                   ImuTest_Online,
+                   (unsigned long)ImuTest_ReadOk,
+                   (unsigned long)ImuTest_ReadFail,
+                   ImuTest_AccelX,
+                   ImuTest_AccelY,
+                   ImuTest_AccelZ,
+                   ImuTest_PitchX10);
         }
     }
 }
